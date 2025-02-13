@@ -3,11 +3,13 @@ WebSocketsServer webSocket = WebSocketsServer(PORT_WEBSOCKET); // #define port_w
 
 void sendSensorData() {
   if (webSocket.connectedClients() > 0) { // Solo enviar si hay clientes conectados
-    String json = "{\"temp\":" + String(23.2) + 
+    String json = "{\"temp\":" + String(23.2) +     // estos son valores de prueba
                   ", \"hum\":" + String(44.5) + 
                   ", \"azim\":" + String(61.1) + 
                   ", \"elev\":" + String(15.5) + 
-                  ", \"giro\":" + String(13.5) + "}";
+                  ", \"giro\":" + String(13.5) + 
+                  ", \"distUS1\":" + String(128.3) + "}";
+//                  ", \"distUS1\":" + String(distanciaUS1,0) + "}";
 //    Serial.println(json);
     webSocket.broadcastTXT(json); // Envía los datos a todos los clientes
     }

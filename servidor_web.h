@@ -27,10 +27,11 @@ const char head_2[1024] PROGMEM =   // Styles
         ".button-off:active {background-color: #2c3e50;}\n"
         "p {font-size: 14px;color: #888;margin-bottom: 10px;}\n";
 
-const char head_3[1024] PROGMEM =
-        ".indicators { display:flex; justify-content: space-around; margin:20px 0;}"
+const char head_3[1200] PROGMEM =
+        ".indicatorsveh { display:flex; justify-content: space-around; margin:20px 0;}"
+        ".indicatorstemp { display:flex; justify-content: space-around; margin:20px 0;}"
         ".indicator { text-align: center;}"
-        ".vehicle {width: 150px;  height: 150px; transition: transform 0.3s ease; transform-origin: center center;}"
+        ".vehicle {width: 100px;  height: 100px; transition: transform 0.3s ease; transform-origin: center center;}"
         ".progress-bar {width: 200px; height: 30px; background-color: #e0e0e0; border-radius: 10px; overflow: hidden; position: relative; margin: 10px auto; }"
         ".progress-bar-fill {height: 100%; background-color: #3498db; width: var(--percent, 0%); }"
         ".progress-bar::after {content: attr(data-value); font-size: 14px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #444444; }"
@@ -50,7 +51,7 @@ const char head_3[1024] PROGMEM =
 const char head_4[512] PROGMEM =   // barras de temperatura y humedad
     "<span id=\"temp\" style=\"display: none;\">--</span>\n"
     "<span id=\"hum\" style=\"display: none;\">--</span>\n"
-    "<div class=\"indicators\">\n"
+    "<div class=\"indicatorstemp\">\n"
       "<div class=\"indicator\">Temperatura\n"
         "<div id=\"tempBar\" class=\"progress-bar\" data-value=\"0%\">\n"
           "<div class=\"progress-bar-fill\" style=\"--percent: 0%;\"></div>\n"
@@ -66,7 +67,7 @@ const char head_4[512] PROGMEM =   // barras de temperatura y humedad
 //const char head_5[2] PROGMEM ="";
 
 const char head_6[512] PROGMEM =    // imágenes de posición del coche
-    "<div class=\"indicators\">\n"
+    "<div class=\"indicatorsveh\">\n"
       "<div class=\"indicator\">\n"
         "<p>Rumbo</p>\n"
         "<img src=\"/cochearriba\" alt=\"Vehiculo\" id=\"vehicleazimut\" class=\"vehicle\">"
@@ -101,6 +102,7 @@ const char head_8[1200] PROGMEM =   // botones movimiento coche
     "<button id=controlButton1 onmousedown=\"sendCommand('giroizda')\" onmouseup=\"sendCommand('stop')\">Giro Izda</button>\n"
     "<button id=controlButton2 onmousedown=\"sendCommand('adelante')\" onmouseup=\"sendCommand('stop')\">Adelante</button>\n"
     "<button id=controlButton3 onmousedown=\"sendCommand('girodcha')\" onmouseup=\"sendCommand('stop')\">Giro Dcha</button><br>\n"
+    "<p><span id=\"distUS1\">--</span>cm</p>"
     "<div style=\"display: flex; align-items: center; justify-content: center; gap: 5px;\">"
       "<div><button id=controlButton4 onmousedown=\"sendCommand('latizq')\" onmouseup=\"sendCommand('stop')\">Lat Izda</button></div>\n"
       "<div>"
@@ -146,6 +148,7 @@ const char script_02[1024] PROGMEM =
       "document.getElementById(\"giro\").innerText = data.giro.toFixed(1);"
       "document.getElementById(\"temp\").innerText = data.temp.toFixed(1);"
       "document.getElementById(\"hum\").innerText = data.hum.toFixed(1);"
+      "document.getElementById(\"distUS1\").innerText = data.distUS1.toFixed(1);"
        // Actualizar indicadores gráficos
       "updateIndicators(data.azim, data.elev, data.giro, data.temp, data.hum);"
       "} catch (e) {"
@@ -229,13 +232,13 @@ String SendHTML(bool refrescar) {
   ptr += head_1;
   ptr += head_2;
   ptr += head_3;
-  ptr += head_4;
   //ptr += head_5;
   ptr += head_6;
   ptr += head_7;
   ptr += head_8;
   //ptr += head_9;
-  ptr += head_10;
+  ptr += head_10;   // control de velocidad
+  ptr += head_4;    // sensores temperatura y humedad
   ptr += script_01;
   ptr += String(PORT_WEBSOCKET);
   ptr += script_02;
