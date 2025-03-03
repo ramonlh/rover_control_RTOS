@@ -28,25 +28,67 @@ const char head_2[1024] PROGMEM =   // Styles
         "p {font-size: 14px;color: #888;margin-bottom: 10px;}\n";
 
 const char head_3[1200] PROGMEM =
-        ".indicatorsveh { display:flex; justify-content: space-around; margin:20px 0;}"
-        ".indicatorstemp { display:flex; justify-content: space-around; margin:20px 0;}"
+        ".indicatorsveh { display:flex; justify-content: space-around; margin:10px 0;}"
+        ".indicatorstemp { display:flex; justify-content: space-around; margin:10px 0;}"
         ".indicator { text-align: center;}"
-        ".vehicle {width: 100px;  height: 100px; transition: transform 0.3s ease; transform-origin: center center;}"
-        ".progress-bar {width: 200px; height: 30px; background-color: #e0e0e0; border-radius: 10px; overflow: hidden; position: relative; margin: 10px auto; }"
+        ".vehicle {width: 60px;  height: 60px; transition: transform 0.3s ease; transform-origin: center center;}"
+        ".progress-bar {width: 150px; height: 20px; background-color: #e0e0e0; border-radius: 10px; overflow: hidden; position: relative; margin: 10px auto; }"
         ".progress-bar-fill {height: 100%; background-color: #3498db; width: var(--percent, 0%); }"
         ".progress-bar::after {content: attr(data-value); font-size: 14px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #444444; }"
         /* Media Queries para dispositivos pequeños */
-        "@media (max-width: 600px) { button { font-size: 14px; padding: 8px 16px;}"
-          ".vehicle { width: 80px; height: 80px;}"
+        "@media (max-width: 300px) { button { font-size: 14px; padding: 8px 16px;}"
+          ".vehicle { width: 60px; height: 80px;}"
         ".progress-bar { width: 80px;} progress-bar-fill { height: 10px;}"
         "#streamImg {width: 240px;height: 180px;}"
         "h1 {font-size: 24px;}"
         "p {font-size: 12px;}"
-        ".inline-buttons {flex-direction: column; gap: 5px;}}"
+        ".inline-buttons {flex-direction: column; gap: 5px;}}";
+
+const char head_3_1[1024] PROGMEM =  
+        ".semicircles-container {"
+          "display: flex;"
+          "justify-content: center;"
+          "align-items: center;"
+          "flex-direction: column;"
+          "margin: 20px;"
+        "}"
+
+        ".semicircle {"
+          "position: absolute;"
+          "width: 80px;"
+          "height: 40px;"
+          "border-top-left-radius: 40px;"
+          "border-top-right-radius: 40px;"
+          "background-color: rgba(52, 152, 219, 0.6);"
+          "opacity: 0.4;"
+          "transition: width 0.3s, height 0.3s, opacity 0.3s;"
+        "}"
+
+        ".semicircle:nth-child(1) {"
+          "animation-delay: 0s;"
+        "}"
+        
+        ".semicircle:nth-child(2) {"
+          "animation-delay: 0.2s;"
+        "}"
+
+        ".semicircle:nth-child(3) {"
+          "animation-delay: 0.4s;"
+        "}"
+
+        ".semicircle:nth-child(4) {"
+          "animation-delay: 0.6s;"
+        "}"
+
+        ".semicircle:nth-child(5) {"
+          "animation-delay: 0.8s;"
+        "}";
+
+const char head_3_2[256] PROGMEM =       
       "</style>\n"
     "</head>\n"
     "<body>\n"
-    "<h3>Control Rover</h3>\n";
+    "<div id=\"wsStatus\" style=\"font-size: 18px; margin-top: 20px; color: green;\"></div>\n";
 
 const char head_4[512] PROGMEM =   // barras de temperatura y humedad
     "<span id=\"temp\" style=\"display: none;\">--</span>\n"
@@ -64,101 +106,163 @@ const char head_4[512] PROGMEM =   // barras de temperatura y humedad
       "</div>"
     "</div>\n";
 
-//const char head_5[2] PROGMEM ="";
-
 const char head_6[512] PROGMEM =    // imágenes de posición del coche
     "<div class=\"indicatorsveh\">\n"
       "<div class=\"indicator\">\n"
-        "<p>Rumbo</p>\n"
         "<img src=\"/cochearriba\" alt=\"Vehiculo\" id=\"vehicleazimut\" class=\"vehicle\">"
-        "<p><span id=\"azim\">--</span>°</p>"
+        "<p>Rumbo: <span id=\"azim\">--</span>°</p>"
       "</div>\n"
       "<div class=\"indicator\">"
-        "<p>Cabeceo</p>"
         "<img src=\"/cochelado\" alt=\"Vehiculo\" id=\"vehicleelevacion\" class=\"vehicle\">"
-        "<p><span id=\"elev\">--</span>°</p>"
+        "<p>Cabeceo: <span id=\"elev\">--</span>°</p>"
       "</div>\n"
       "<div class=\"indicator\">"
-        "<p>Alabeo</p>"
         "<img src=\"/cochetrasera\" alt=\"Vehiculo\" id=\"vehiclegiro\" class=\"vehicle\">"
-        "<p><span id=\"giro\">--</span>°</p>"
+        "<p>Alabeo: <span id=\"giro\">--</span>°</p>"
       "</div>\n"
     "</div>\n";      
 
 const char head_7[1024] PROGMEM =    // botones de movimiento cámara
-    "<button id=controlButton9 onmousedown=\"startMovingServo2('camup')\" onmouseup=\"stopMovingServo2()\">&#9650;</button><br>\n"
+    "<button id=controlButton1 onmousedown=\"startMovingServo2('camarriba')\" onmouseup=\"stopMovingServo2()\">&#9650;</button><br>\n"
     "<div style=\"display: flex; align-items: center; justify-content: center; gap: 5px;\">"
-      "<div><button id=controlButton7 onmousedown=\"startMovingServo1('camizda')\" onmouseup=\"stopMovingServo1()\">&#9664;</button>\n</div>\n"
+      "<div><button id=controlButton2 onmousedown=\"startMovingServo1('camizda')\" onmouseup=\"stopMovingServo1()\">&#9664;</button>\n</div>\n"
       "<div>"
         "<img id=\"streamImg\" src=\"http://192.168.11.120:81/stream\" alt=\"cam\" width=\"320\" height=\"240\" >\n" //imagen de la cámara
       "</div>\n"
       "<div>\n"
-        "<button id=controlButton8 onmousedown=\"startMovingServo1('camdcha')\" onmouseup=\"stopMovingServo1()\">&#9654;</button>\n"
+        "<button id=controlButton3 onmousedown=\"startMovingServo1('camdcha')\" onmouseup=\"stopMovingServo1()\">&#9654;</button>\n"
       "</div>"
     "</div>\n"
-    "<button id=controlButton10 onmousedown=\"startMovingServo2('camdown')\" onmouseup=\"stopMovingServo2()\">&#9660;</button><br>\n";
+    "<button id=controlButton4 onmousedown=\"startMovingServo2('camabajo')\" onmouseup=\"stopMovingServo2()\">&#9660;</button><br>\n";
 
-const char head_8[1200] PROGMEM =   // botones movimiento coche
-    "<button id=controlButton1 onmousedown=\"sendCommand('giroizda')\" onmouseup=\"sendCommand('stop')\">Giro Izda</button>\n"
-    "<button id=controlButton2 onmousedown=\"sendCommand('adelante')\" onmouseup=\"sendCommand('stop')\">Adelante</button>\n"
-    "<button id=controlButton3 onmousedown=\"sendCommand('girodcha')\" onmouseup=\"sendCommand('stop')\">Giro Dcha</button><br>\n"
+const char head_8[1512] PROGMEM =   // botones movimiento coche
+    "<div class=\"semicircles-container\">"
+    "  <div class=\"semicircle\" id=\"semiwave1\"></div>"
+    "  <div class=\"semicircle\" id=\"semiwave2\"></div>"
+    "  <div class=\"semicircle\" id=\"semiwave3\"></div>"
+    "  <div class=\"semicircle\" id=\"semiwave4\"></div>"
+    "  <div class=\"semicircle\" id=\"semiwave5\"></div>"
+    "</div>"
     "<p><span id=\"distUS1\">--</span>cm</p>"
+    "<button id=controlButton5 onmousedown=\"sendCommand('giroizda')\" onmouseup=\"sendCommand('stop')\">Giro Izda</button>\n"
+    "<button id=controlButton6 onmousedown=\"sendCommand('adelante')\" onmouseup=\"sendCommand('stop')\">Adelante</button>\n"
+    "<button id=controlButton7 onmousedown=\"sendCommand('girodcha')\" onmouseup=\"sendCommand('stop')\">Giro Dcha</button><br>\n"
     "<div style=\"display: flex; align-items: center; justify-content: center; gap: 5px;\">"
-      "<div><button id=controlButton4 onmousedown=\"sendCommand('latizq')\" onmouseup=\"sendCommand('stop')\">Lat Izda</button></div>\n"
+      "<div><button id=controlButton8 onmousedown=\"sendCommand('latizda')\" onmouseup=\"sendCommand('stop')\">Lat Izda</button></div>\n"
       "<div>"
         "<img src=\"/cochearriba\" alt=\"Vehiculo\" id=\"vehicleinutil\" class=\"vehicle\">"  // aquí va la imagen de la cámara
       "</div>\n"
       "<div>\n"
-        "<button id=controlButton6 onmousedown=\"sendCommand('latder')\" onmouseup=\"sendCommand('stop')\">Lat Dcha</button>\n"
+        "<button id=controlButton9 onmousedown=\"sendCommand('latdcha')\" onmouseup=\"sendCommand('stop')\">Lat Dcha</button>\n"
       "</div>"
     "</div>\n"
-    "<button id=controlButton12 onmousedown=\"sendCommand('giroizda')\" onmouseup=\"sendCommand('stop')\">Atras Izda</button>\n"
-    "<button id=controlButton13 onmousedown=\"sendCommand('atras')\" onmouseup=\"sendCommand('stop')\"> Atras  </button>\n"
-    "<button id=controlButton14 onmousedown=\"sendCommand('girodcha')\" onmouseup=\"sendCommand('stop')\">Atras Der</button><br>\n";
+    "<button id=controlButton10 onmousedown=\"sendCommand('atrasizda')\" onmouseup=\"sendCommand('stop')\">Atras Izda</button>\n"
+    "<button id=controlButton11 onmousedown=\"sendCommand('atras')\" onmouseup=\"sendCommand('stop')\"> Atras  </button>\n"
+    "<button id=controlButton12 onmousedown=\"sendCommand('atrasdcha')\" onmouseup=\"sendCommand('stop')\">Atras Der</button><br>\n";
 
 //const char head_9[512] PROGMEM ="";
 
-const char head_10[512] PROGMEM =
-  "<button id=controlButton11 onmousedown=\"sendCommand('rotizda')\" onmouseup=\"sendCommand('stop')\">Rot Izda</button>\n"
+const char head_10[2048] PROGMEM =
+  "<button id=controlButton13 onmousedown=\"sendCommand('rotizda')\" onmouseup=\"sendCommand('stop')\">Rot Izda</button>\n"
   "<button id=controlButton14 onmousedown=\"sendCommand('rotdcha')\" onmouseup=\"sendCommand('stop')\">Rot Dcha</button><br>\n"
   // Botones de velocidad en la misma línea -->
-  "<div class=\"inline-buttons\">\n"
+  "<div style=\"display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px;\">"
     "<button onclick=\"changeSpeed(-500)\">---</button>\n"
-    "Velocidad:<span id=\"rover_speed_display\">1000</span>\n"
-    "<button onclick=\"changeSpeed(+500)\">+++</button>\n"
+
+    "<div>\n"
+      "<span id=\"rover_speed_display\">2000</span>\n"
+    "</div>\n"
+    "<div id=\"speedometer\" style=\"width: 100px; height: 100px; position: relative;\">"
+        "<svg width=\"100\" height=\"100\" viewBox=\"0 0 100 100\">"
+          "<!-- Círculo de fondo -->"
+          "<circle cx=\"50\" cy=\"50\" r=\"50\" stroke=\"#ddd\" stroke-width=\"4\" fill=\"none\"></circle>"
+              "<!-- Escala -->"
+          "<g id=\"scale\">"
+            "<!-- Crea marcas para la escala -->"
+            "<line x1=\"50\" y1=\"5\" x2=\"50\" y2=\"15\" stroke=\"#333\" stroke-width=\"2\" transform=\"rotate(-90 50 50)\"></line>"
+            "<line x1=\"50\" y1=\"5\" x2=\"50\" y2=\"15\" stroke=\"#333\" stroke-width=\"2\" transform=\"rotate(-60 50 50)\"></line>"
+            "<line x1=\"50\" y1=\"5\" x2=\"50\" y2=\"15\" stroke=\"#333\" stroke-width=\"2\" transform=\"rotate(-30 50 50)\"></line>"
+            "<line x1=\"50\" y1=\"5\" x2=\"50\" y2=\"15\" stroke=\"#333\" stroke-width=\"2\" transform=\"rotate(0 50 50)\"></line>"
+            "<line x1=\"50\" y1=\"5\" x2=\"50\" y2=\"15\" stroke=\"#333\" stroke-width=\"2\" transform=\"rotate(30 50 50)\"></line>"
+            "<line x1=\"50\" y1=\"5\" x2=\"50\" y2=\"15\" stroke=\"#333\" stroke-width=\"2\" transform=\"rotate(60 50 50)\"></line>"
+            "<line x1=\"50\" y1=\"5\" x2=\"50\" y2=\"15\" stroke=\"#333\" stroke-width=\"2\" transform=\"rotate(90 50 50)\"></line>"
+          "</g>"
+          "<!-- Aguja -->"
+          "<line id=\"needle\" x1=\"50\" y1=\"50\" x2=\"50\" y2=\"20\" stroke=\"#e74c3c\" stroke-width=\"3\" transform-origin=\"50 50\" transform=\"rotate(0)\"></line>"
+          "<text id=\"speedText\" x=\"50\" y=\"70\" text-anchor=\"middle\" font-size=\"12\" fill=\"#444\">2000</text>\""
+        "</svg>"
+      "</div>"
+      "<button onclick=\"changeSpeed(+500)\">+++</button>\n"
+      "<button id=\"luzButton\" onclick=\"toggleLUZ()\">LUZ</button>"
   "</div>\n";
+
+const char head_10_1[1580] PROGMEM =   "<div style=\"display: flex; justify-content: center; align-items: center; flex-direction: column; margin: 20px;\">"
+      
+    "</div>";
+
 
 const char script_01[128] PROGMEM =
   "<script>\n"
     "let ws;\n"
-    "let rover_speed=1000;\n" // Velocidad inicial
+    "let rover_speed=2048;\n" // Velocidad inicial
     // Conectar WebSocket
     "function connectWebSocket() {\n"
       "ws=new WebSocket(`ws://${location.hostname}:";
-const char script_02[1024] PROGMEM =    
+
+const char script_02[2048] PROGMEM =    
     "/`);\n"
     "ws.onopen = () => {\n"
       "console.log(\"WebSocket conectado\");};\n"
+      "document.getElementById(\"wsStatus\").innerText = \"Control Rover: Conectado\";"
+      "document.getElementById(\"wsStatus\").style.color = \"green\";" // Cambia el color a verde
+
+
     "ws.onmessage = (event) => {"
       "console.log(\"Datos recibidos:\", event.data);"
       "try {"
-      "let data = JSON.parse(event.data);"
-      "document.getElementById(\"azim\").innerText = data.azim.toFixed(1);"
-      "document.getElementById(\"elev\").innerText = data.elev.toFixed(1);"
-      "document.getElementById(\"giro\").innerText = data.giro.toFixed(1);"
-      "document.getElementById(\"temp\").innerText = data.temp.toFixed(1);"
-      "document.getElementById(\"hum\").innerText = data.hum.toFixed(1);"
-      "document.getElementById(\"distUS1\").innerText = data.distUS1.toFixed(1);"
-       // Actualizar indicadores gráficos
-      "updateIndicators(data.azim, data.elev, data.giro, data.temp, data.hum);"
-      "} catch (e) {"
-      "console.error(\"Error al procesar datos:\", e);"
-      "}"
+        "let data = JSON.parse(event.data);"
+
+    // Actualizar distUS1
+      "if (data.distUS1 !== undefined) {"
+        "document.getElementById(\"distUS1\").innerText = data.distUS1.toFixed(2);" // Mostrar la distancia
+        // Controlar las semicircunferencias según la distancia
+        "let dist = data.distUS1;"
+        // Normalizar la distancia para el rango entre 30 y 200
+        "let normalizedDist = Math.max(30, Math.min(dist, 200));" // Mantener dentro de 30-200
+        "let waveCount = Math.min(Math.max(Math.floor(normalizedDist / 50), 1), 5);"
+        //"let waveCount = Math.min(Math.max(Math.floor(dist / 50), 1), 5);" // 1 a 5 semicircunferencias
+        "for (let i = 1; i <= 5; i++) {"
+          "let wave = document.getElementById(`semiwave${i}`);"
+          "if (i <= waveCount) {"
+            "wave.style.opacity = 1;" // Mostrar semicircunferencia
+            // Ajustar el tamaño de la onda en función de la distancia
+            "let sizeFactor = (200 - normalizedDist) / 170;" // 200 es el valor máximo y 30 es el mínimo
+            "wave.style.width = `${40 + sizeFactor * 60}px`;" // Establecer el tamaño de la onda
+            "wave.style.height = `${20 + sizeFactor * 30}px`;" // Establecer el tamaño de la onda
+            "} else {"
+              "wave.style.opacity = 0;" // Semicircunferencia oculta
+            "}"
+          "}"
+        "}"
+
+        "document.getElementById(\"azim\").innerText = data.azim.toFixed(1);"
+        "document.getElementById(\"elev\").innerText = data.elev.toFixed(1);"
+        "document.getElementById(\"giro\").innerText = data.giro.toFixed(1);"
+        "document.getElementById(\"temp\").innerText = data.temp.toFixed(1);"
+        "document.getElementById(\"hum\").innerText = data.hum.toFixed(1);"
+        "document.getElementById(\"distUS1\").innerText = data.distUS1.toFixed(1);"
+         // Actualizar indicadores gráficos
+        "updateIndicators(data.azim, data.elev, data.giro, data.temp, data.hum);"
+        "} catch (e) {"
+        "console.error(\"Error al procesar datos:\", e);"
+        "}"
       "};";
        
-const char script_03[1024] PROGMEM =    
+const char script_03[1580] PROGMEM =    
     "ws.onclose = () => {\n"
       "console.log(\"WebSocket desconectado\");\n"
+      "document.getElementById(\"wsStatus\").innerText = \"Control Rover: Desconectado\";"
+      "document.getElementById(\"wsStatus\").style.color = \"red\";" // Cambia el color a rojo
       "setTimeout(connectWebSocket, 2000);};\n" // Reconectar después de 3 segundos
       "ws.onerror = (error) => {\n"
       "console.error(\"Error en WebSocket:\", error);};}\n"
@@ -170,13 +274,24 @@ const char script_03[1024] PROGMEM =
     // Cambiar la velocidad
     "function changeSpeed(increment) {\n"
       "rover_speed+=increment;\n"
-      "rover_speed=Math.max(0, Math.min(4095, rover_speed));\n" // Limitar entre 0 y 4095
+      "rover_speed=Math.max(500, Math.min(4000, rover_speed));\n" // Limitar entre 0 y 4095
       "document.getElementById('rover_speed_display').innerText = rover_speed;\n"
+      "document.getElementById('speedText').textContent = rover_speed;" // Cambiado a textContent
+
+      // Calcula el ángulo para la aguja (0° para velocidad mínima, 180° para velocidad máxima)
+      "const maxSpeed = 4095;"
+      "const minAngle = -90;" // Aguja en 0
+      "const maxAngle = 90;"  // Aguja en velocidad máxima
+      "const angle = minAngle + (rover_speed / maxSpeed) * (maxAngle - minAngle);"
+      // Actualiza la rotación de la aguja
+      "const needle = document.getElementById('needle');"
+      "needle.style.transform = `rotate(${angle}deg)`;"
+
       "fetch(`/setSpeed?value=${rover_speed}`)\n"
-      ".then(response => {\n"
-      "if (!response.ok) {\n"
-      "throw new Error(\"Error al actualizar la velocidad\");}})\n"
-      ".catch(error=>console.error(\"Error:\",error));}\n";
+        ".then(response => {\n"
+        "if (!response.ok) {\n"
+        "throw new Error(\"Error al actualizar la velocidad\");}})\n"
+        ".catch(error=>console.error(\"Error:\",error));}\n";
 
 const char script_04[1024] PROGMEM =    
     // Iniciar conexión WebSocket
@@ -204,7 +319,7 @@ const char script_04[1024] PROGMEM =
       "clearInterval(moveInterval);\n" // Detener movimiento al soltar el botón
       "sendCommand('camstop');}\n"; // Enviar comando de detener el servo
 
-const char script_05[1024] PROGMEM =    
+const char script_05[1278] PROGMEM =    
     "function updateIndicators(azimut,elevacion,giro,temp,hum) {"
       "document.getElementById(\"vehicleazimut\").style.transform=`rotate(${azimut}deg)`;"
       "document.getElementById(\"vehicleelevacion\").style.transform=`rotate(${elevacion}deg)`;"
@@ -222,6 +337,11 @@ const char script_05[1024] PROGMEM =
       "document.getElementById(\"azim\").innerText=azimut.toFixed(1);"
       "document.getElementById(\"elev\").innerText=elevacion.toFixed(1);"
       "document.getElementById(\"giro\").innerText=giro.toFixed(1);}"
+      "function toggleLUZ() {"
+          "fetch('/toggleLUZ')"
+          ".then(response => response.text())"
+          ".then(data => console.log(\"Respuesta del servidor:\", data))"
+          ".catch(error => console.error(\"Error:\", error));}"
     "</script>\n"
     "</body>\n"
   "</html>\n";
@@ -232,12 +352,15 @@ String SendHTML(bool refrescar) {
   ptr += head_1;
   ptr += head_2;
   ptr += head_3;
+  ptr += head_3_1;
+  ptr += head_3_2;
   //ptr += head_5;
   ptr += head_6;
   ptr += head_7;
   ptr += head_8;
   //ptr += head_9;
   ptr += head_10;   // control de velocidad
+  ptr += head_10_1;   // control de velocidad
   ptr += head_4;    // sensores temperatura y humedad
   ptr += script_01;
   ptr += String(PORT_WEBSOCKET);
@@ -268,6 +391,11 @@ void handleSetValue() {
   webserver.send(204, "text/plain", ""); // Respuesta sin contenido
 }
 
+void handleToggleLUZ() {
+    digitalWrite(pin_led_7colores, !digitalRead(pin_led_7colores)); // Cambia el estado del pin
+    webserver.send(200, "text/plain", "LUZ toggled");
+}
+
 void handle_adelante() {
   Serial.println("adelante html");
   rover_adelante();
@@ -289,12 +417,23 @@ void handle_giroderecha() {
   webserver.send(204, "text/plain", ""); // Respuesta sin contenido
 }
 
+void handle_atrasizquierda() {
+  rover_atras_izda();
+  webserver.send(204, "text/plain", ""); // Respuesta sin contenido
+}
+
+void handle_atrasderecha() {
+  rover_atras_dcha();
+  webserver.send(204, "text/plain", ""); // Respuesta sin contenido
+}
+
 void handle_setspeed() {
   if (webserver.hasArg("value")) {
     String value = webserver.arg("value");
     rover_speed = value.toInt(); // Actualizar la variable rover_speed
     webserver.send(200, "text/plain", "Velocidad actualizada: " + String(rover_speed));
-    Serial.println("Velocidad actualizada: " + String(rover_speed)); } 
+    //Serial.println("Velocidad actualizada: " + String(rover_speed)); 
+    } 
   else {
     webserver.send(400, "text/plain", "Falta el parámetro 'value'");   }
 }
@@ -350,10 +489,13 @@ void init_webserver()
   webserver.on("/atras", handle_atras);
   webserver.on("/giroizquierda", handle_giroizquierda);
   webserver.on("/giroderecha", handle_giroderecha);
+  webserver.on("/atrasizquierda", handle_giroizquierda);
+  webserver.on("/atrasderecha", handle_giroderecha);
   webserver.on("/setSpeed", handle_setspeed);
   webserver.on("/cochearriba", handle_cochearriba);
   webserver.on("/cochelado", handle_cochelado);
   webserver.on("/cochetrasera", handle_cochetrasera);
+  webserver.on("/toggleLUZ", handleToggleLUZ);
 
   webserver.onNotFound(handle_NotFound); 
   webserver.begin();

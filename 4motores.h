@@ -2,7 +2,15 @@
 #include "mcp23017.h"
 #include <pca9685.h>
 
+#define MFORWARD 1   // motor adelante
+#define MBACK 0   // motor adelante
+#define MDI 4   // motor delantero izquierdo
+#define MTI 2   // motor trasero izquierdo 
+#define MDD 3   // motor delantero izquierdo
+#define MTD 1   // motor trasero izquierdo 
+
 const uint8_t pin_dir[4][2] = {{0, 1}, {2, 3}, {4, 5}, {6, 7}}; // pines del mux mcp23017
+// 0=DI  1=TI  2= DD    3=TD
 const uint8_t pin_motor[4] = {0, 1, 2, 3};                      // salidas pwm del mux PCA9685
 
 static Output low = Output::Low;
@@ -10,7 +18,6 @@ static Output high = Output::High;
 
 static int rover_speed = 1000;
 int rumbo_adelante=0;
-
 
 void pinModeMux(int pin, int mode)
 {
@@ -87,60 +94,91 @@ void init_motores()
 
 void rover_stop()
 {
-    set_motor(1, 1, 0);    // motor, sentido giro, velocidad
-    set_motor(2, 1, 0);    // motor, sentido giro, velocidad
-    set_motor(3, 1, 0);    // motor, sentido giro, velocidad
-    set_motor(4, 1, 0);    // motor, sentido giro, velocidad
+    set_motor(1, MFORWARD, 0);    // motor, sentido giro, velocidad
+    set_motor(2, MFORWARD, 0);    // motor, sentido giro, velocidad
+    set_motor(3, MFORWARD, 0);    // motor, sentido giro, velocidad
+    set_motor(4, MFORWARD, 0);    // motor, sentido giro, velocidad
 }
 
 void rover_adelante()
 {
-    set_motor(1, 1, rover_speed);    // motor, sentido giro, velocidad
-    set_motor(2, 1, rover_speed);    // motor, sentido giro, velocidad
-    set_motor(3, 1, rover_speed);    // motor, sentido giro, velocidad
-    set_motor(4, 1, rover_speed);    // motor, sentido giro, velocidad
+    set_motor(1, MFORWARD, rover_speed);    // motor, sentido giro, velocidad
+    set_motor(2, MFORWARD, rover_speed);    // motor, sentido giro, velocidad
+    set_motor(3, MFORWARD, rover_speed);    // motor, sentido giro, velocidad
+    set_motor(4, MFORWARD, rover_speed);    // motor, sentido giro, velocidad
 }
 
 void rover_atras()
 {
-    set_motor(1, 0, rover_speed);    // motor, sentido giro, velocidad
-    set_motor(2, 0, rover_speed);    // motor, sentido giro, velocidad
-    set_motor(3, 0, rover_speed);    // motor, sentido giro, velocidad
-    set_motor(4, 0, rover_speed);    // motor, sentido giro, velocidad
+    set_motor(1, MBACK, rover_speed);    // motor, sentido giro, velocidad
+    set_motor(2, MBACK, rover_speed);    // motor, sentido giro, velocidad
+    set_motor(3, MBACK, rover_speed);    // motor, sentido giro, velocidad
+    set_motor(4, MBACK, rover_speed);    // motor, sentido giro, velocidad
 }
 
 void rover_giro_dcha()
 {
-    set_motor(1, 1, rover_speed);    // motor, sentido giro, velocidad
-    set_motor(2, 1, rover_speed);    // motor, sentido giro, velocidad
-    set_motor(3, 0, 0);    // motor, sentido giro, velocidad
-    set_motor(4, 0, 0);    // motor, sentido giro, velocidad
+    set_motor(MDI, MFORWARD, rover_speed);    // motor, sentido giro, velocidad
+    set_motor(MTI, MFORWARD, rover_speed);    // motor, sentido giro, velocidad
+    set_motor(MDD, MFORWARD, 0);    // motor, sentido giro, velocidad
+    set_motor(MTD, MFORWARD, 0);    // motor, sentido giro, velocidad
 }
 
 void rover_giro_izda()
 {
-    set_motor(1, 0, 0);    // motor, sentido giro, velocidad
-    set_motor(2, 0, 0);    // motor, sentido giro, velocidad
-    set_motor(3, 1, rover_speed);    // motor, sentido giro, velocidad
-    set_motor(4, 1, rover_speed);    // motor, sentido giro, velocidad
+    set_motor(MDI, MFORWARD, 0);    // motor, sentido giro, velocidad
+    set_motor(MTI, MFORWARD, 0);    // motor, sentido giro, velocidad
+    set_motor(MDD, MFORWARD, rover_speed);    // motor, sentido giro, velocidad
+    set_motor(MTD, MFORWARD, rover_speed);    // motor, sentido giro, velocidad
+}
+
+void rover_atras_dcha()
+{
+    set_motor(MDI, MBACK, rover_speed);    // motor, sentido giro, velocidad
+    set_motor(MTI, MBACK, rover_speed);    // motor, sentido giro, velocidad
+    set_motor(MDD, MBACK, 0);    // motor, sentido giro, velocidad
+    set_motor(MTD, MBACK, 0);    // motor, sentido giro, velocidad
+}
+
+void rover_atras_izda()
+{
+    set_motor(MDI, MBACK, 0);    // motor, sentido giro, velocidad
+    set_motor(MTI, MBACK, 0);    // motor, sentido giro, velocidad
+    set_motor(MDD, MBACK, rover_speed);    // motor, sentido giro, velocidad
+    set_motor(MTD, MBACK, rover_speed);    // motor, sentido giro, velocidad
 }
 
 void rover_rot_izda()
 {
-    set_motor(1, 0, rover_speed);    // motor, sentido giro, velocidad
-    set_motor(2, 0, rover_speed);    // motor, sentido giro, velocidad
-    set_motor(3, 1, rover_speed);    // motor, sentido giro, velocidad
-    set_motor(4, 1, rover_speed);    // motor, sentido giro, velocidad
+    set_motor(MDI, MBACK, rover_speed);    // motor, sentido giro, velocidad
+    set_motor(MTI, MBACK, rover_speed);    // motor, sentido giro, velocidad
+    set_motor(MDD, MFORWARD, rover_speed);    // motor, sentido giro, velocidad
+    set_motor(MTD, MFORWARD, rover_speed);    // motor, sentido giro, velocidad
 }
 
 void rover_rot_dcha()
 {
-    set_motor(1, 1, rover_speed);    // motor, sentido giro, velocidad
-    set_motor(2, 1, rover_speed);    // motor, sentido giro, velocidad
-    set_motor(3, 0, rover_speed);    // motor, sentido giro, velocidad
-    set_motor(4, 0, rover_speed);    // motor, sentido giro, velocidad
+    set_motor(MDI, MFORWARD, rover_speed);    // motor, sentido giro, velocidad
+    set_motor(MTI, MFORWARD, rover_speed);    // motor, sentido giro, velocidad
+    set_motor(MDD, MBACK, rover_speed);    // motor, sentido giro, velocidad
+    set_motor(MTD, MBACK, rover_speed);    // motor, sentido giro, velocidad
 }
 
+void rover_lat_izda()
+{
+    set_motor(MDI, MBACK, rover_speed);    // motor, sentido giro, velocidad
+    set_motor(MTI, MFORWARD, rover_speed);    // motor, sentido giro, velocidad
+    set_motor(MDD, MFORWARD, rover_speed);    // motor, sentido giro, velocidad
+    set_motor(MTD, MBACK, rover_speed);    // motor, sentido giro, velocidad
+}
+
+void rover_lat_dcha()
+{
+    set_motor(MDI, MFORWARD, rover_speed);    // motor, sentido giro, velocidad
+    set_motor(MTI, MBACK, rover_speed);    // motor, sentido giro, velocidad
+    set_motor(MDD, MBACK, rover_speed);    // motor, sentido giro, velocidad
+    set_motor(MTD, MFORWARD, rover_speed);    // motor, sentido giro, velocidad
+}
 
 void conservar_rumbo()
 {

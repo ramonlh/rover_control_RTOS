@@ -8,16 +8,17 @@ void init_pantalla()
   // Pantalla TFT
   tft.init();
   tft.setRotation(3);
-  tft.fillScreen(TFT_RED);
+  tft.fillScreen(TFT_BLACK);
   tft.setTextColor(TFT_WHITE);
 
   tft.setCursor(0, 0);
   tft.setTextSize(1);
   tft.println("Hola");
   tft.setTextSize(2);
-  tft.println("Hola");
+  tft.println("Pantalla iniciada OK");
 
   Serial.print("TFT_MISO:");   Serial.println(TFT_MISO);  //   19
+  Serial.print("TFT_MOSI:");   Serial.println(TFT_MOSI);  //   19
   Serial.print("TFT_SCLK:");   Serial.println(TFT_SCLK);  //    18
   Serial.print("TFT_CS:");     Serial.println(TFT_CS);  //      15
   Serial.print("TFT_DC:");     Serial.println(TFT_DC);  //       2

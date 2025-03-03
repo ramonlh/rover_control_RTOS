@@ -1,7 +1,7 @@
 
 
-const int US1_EchoPin = pin_US1_receptor;   // 26
-const int US1_TriggerPin = pin_US1_emisor;  // 25
+const int US1_EchoPin = pin_US1_receptor;   // 34
+const int US1_TriggerPin = pin_US1_emisor;  // 33
 
 long distanciaUS1;
 
@@ -12,7 +12,7 @@ void task_ultrasonidos(void *pvParameters) {
   Serial.println("Sensor ultrasonidos OK");
 
   // Variables para el filtro de promedio móvil
-  const int numReadings = 5;
+  const int numReadings = 3;
   int readings[numReadings];
   int readIndex = 0;
   long total = 0;
@@ -30,16 +30,14 @@ void task_ultrasonidos(void *pvParameters) {
     digitalWrite(US1_TriggerPin, HIGH);
     delayMicroseconds(10);
     digitalWrite(US1_TriggerPin, LOW);
-
     // Medir la duración del eco
     duration = pulseIn(US1_EchoPin, HIGH, 10000); // Timeout de 10 ms
-
     // Calcular la distancia
     if (duration > 0) {
       long distance = duration * 10 / 292 / 2; // Convertir a distancia en cm
-
+      //Serial.println(distance);
       // Aplicar filtro de promedio móvil
-      total -= readings[readIndex];
+       total -= readings[readIndex];
       readings[readIndex] = distance;
       total += readings[readIndex];
       readIndex = (readIndex + 1) % numReadings;
@@ -49,7 +47,7 @@ void task_ultrasonidos(void *pvParameters) {
     else {
       distanciaUS1 = -1; // Valor inválido si no se detecta eco
       }
-
+    //Serial.println(distanciaUS1);
     // Esperar hasta que haya pasado 100 ms desde la última ejecución
     vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(100));
   }
