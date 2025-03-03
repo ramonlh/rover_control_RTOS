@@ -11,8 +11,8 @@
 
 #define WIFI_TRIGGER_PIN 0    // gpio para reset WiFi y acceder al menu WifiManager
 #define pin_radio_control 32
-#define pin_US1_receptor 26
-#define pin_US1_emisor 25
+#define pin_US1_receptor 34
+#define pin_US1_emisor 33 
 #define pin_led_7colores 27
 #define pin_radar 14
 #define pin_SDA 21

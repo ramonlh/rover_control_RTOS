@@ -19,6 +19,8 @@
 //#include "conectar_wifi.h"
 #include "ota.h"
 
+#include "pantalla.h"
+
 #include <sistema_ficheros.h>  
 #include "giroscopio.h"
 #include "4motores.h"
@@ -48,13 +50,13 @@ long time60 = 0;
 void cosas_cada_segundo()
 {
   unixtime++;
-
+  sendSensorData();  
   time1 = millis();
 }
 
 void cosas_cada_10segundos()
 {
-  sendSensorData();  
+ // sendSensorData();  
   time10 = millis();
 }
 
@@ -87,28 +89,12 @@ void handle_serial_commands()
     {
      char car = Serial.read();
      Serial.print("leido:"); Serial.print(car); Serial.println(":");
-     if (car == 'i')
-       {
-       angulo_servo_1=10; 
-       angulo_servo_2=10; 
-       }
-     if (car == 'm')
-       {
-       angulo_servo_1=90; 
-       angulo_servo_2=90; 
-       }
-     if (car == 'f')
-       {
-       angulo_servo_1=150; 
-       angulo_servo_2=150; 
-       }
-     Serial.println(angulo_servo_1);
-     Serial.println(angulo_servo_2);
     }
 }
 
 void setup() {
   Serial.begin(115200);
+  init_pantalla();
   // init conexiones y servidores
   ini_sistema_ficheros();
   init_wifi_manager();
@@ -121,7 +107,6 @@ void setup() {
   // init motores
   init_motores();
 
-  //init_pantalla();
 
   pinMode(pin_led_7colores, OUTPUT);
   digitalWrite(pin_led_7colores, HIGH);

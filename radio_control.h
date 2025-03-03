@@ -2,6 +2,8 @@
 
 #include <RCSwitch.h>
 
+//#define pin_radio_control 32
+
 RCSwitch mySwitch = RCSwitch();
 
 // códigos mando blanco RF433
@@ -19,46 +21,17 @@ int decode_RC(unsigned long codeRC) {
   return 0; // No encontrado
 }
 
-/*
-int decode_RC(long codeRC)
-{
-  bool encontrado = false;
-  int i = 0;
-  while ((i<num_buttonsRC) && (!encontrado))
-    {
-    encontrado = (codesRC[i] == codeRC);
-    i++;
-    }
-  if (encontrado)
-    return i;
-  else
-    return 0;
-}
-*/
-
 // Función para leer el código RF
 int lee_RC() {
   if (mySwitch.available()) {
     unsigned long code = mySwitch.getReceivedValue();
     mySwitch.resetAvailable();
     if (code == 0) return 0; // Código inválido
+    Serial.println(code);
     return decode_RC(code);
   }
   return 0;
 }
-
-/*
-int lee_RC()
-{
-  int boton_aux = 0;
-  if (mySwitch.available()) {
-    long code= mySwitch.getReceivedValue();
-    mySwitch.resetAvailable();
-    boton_aux = decode_RC(code);
-    }
-  return boton_aux;
-}
-*/
 
 void task_radiocontrol(void *pvParameters) 
 {  
@@ -77,8 +50,8 @@ void task_radiocontrol(void *pvParameters)
         }
       else if (boton_RC == 2)
         {
-        //rumbo_adelante=2;
-        rover_atras();
+        rumbo_adelante=0;
+        rover_giro_dcha();
         }
       else if (boton_RC == 3)
         {
@@ -87,36 +60,55 @@ void task_radiocontrol(void *pvParameters)
         }    
       else if (boton_RC == 4)
         {
-        rumbo_adelante=0;
-        rover_giro_dcha();
+        rover_atras();
         }
       else if (boton_RC == 5)
         {
         rumbo_adelante=0;
-        rover_rot_izda();
+        rover_lat_izda();
         }    
       else if (boton_RC == 6)
         {
         rumbo_adelante=0;
-        rover_rot_dcha();
+        rover_lat_dcha();
         }
       else if (boton_RC == 7)
         {
-        digitalWrite(pin_led_7colores, HIGH);
-        }
+        rumbo_adelante=0;
+        rover_atras_izda();
+        }    
       else if (boton_RC == 8)
         {
-        digitalWrite(pin_led_7colores, LOW);
+        rumbo_adelante=0;
+        rover_atras_dcha();
         }
       else if (boton_RC == 9)
+        {
+        rumbo_adelante=0;
+        rover_rot_izda();
+        }    
+      else if (boton_RC == 10)
+        {
+        rumbo_adelante=0;
+        rover_rot_dcha();
+        }
+      else if (boton_RC == 11)
         {
         //rumbo_adelante=0;
         set_speed_rover(rover_speed-500);
         }    
-      else if (boton_RC == 10)
+      else if (boton_RC == 12)
         {
         //rumbo_adelante=0;
         set_speed_rover(rover_speed+500);
+        }
+      else if (boton_RC == 13)
+        {
+        digitalWrite(pin_led_7colores, HIGH);
+        }
+      else if (boton_RC == 14)
+        {
+        digitalWrite(pin_led_7colores, LOW);
         }
       else if ((boton_RC == 15) || (boton_RC == 16))
         {

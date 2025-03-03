@@ -3,14 +3,14 @@ WebSocketsServer webSocket = WebSocketsServer(PORT_WEBSOCKET); // #define port_w
 
 void sendSensorData() {
   if (webSocket.connectedClients() > 0) { // Solo enviar si hay clientes conectados
-    String json = "{\"temp\":" + String(23.2) +     // estos son valores de prueba
-                  ", \"hum\":" + String(44.5) + 
-                  ", \"azim\":" + String(61.1) + 
-                  ", \"elev\":" + String(15.5) + 
-                  ", \"giro\":" + String(13.5) + 
-                  ", \"distUS1\":" + String(128.3) + "}";
+    String json = "{\"temp\":" + String(valores_DHT11.temperature) +     // estos son valores de prueba
+                  ", \"hum\":" + String(valores_DHT11.humidity) + 
+                  ", \"azim\":" + String(angleZ) + 
+                  ", \"elev\":" + String(angleY) + 
+                  ", \"giro\":" + String(angleX) + 
+                  ", \"distUS1\":" + String(distanciaUS1) + "}";
 //                  ", \"distUS1\":" + String(distanciaUS1,0) + "}";
-//    Serial.println(json);
+    //Serial.println(json);
     webSocket.broadcastTXT(json); // Envía los datos a todos los clientes
     }
 }
@@ -19,6 +19,7 @@ void sendSensorData() {
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length) {
     if (type == WStype_TEXT) {
         String message = (char*)payload;
+        //Serial.println(message);
         if (message == "adelante") {
           rover_adelante();          }
         else if (message == "atras") {
@@ -27,20 +28,28 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
           rover_giro_izda();          }
         else if (message == "girodcha") {
           rover_giro_dcha();          }
+        else if (message == "atrasizda") {
+          rover_atras_izda();          }
+        else if (message == "atrasdcha") {
+          rover_atras_dcha();          }
         else if (message == "rotizda") {
           rover_rot_izda();          }
         else if (message == "rotdcha") {
           rover_rot_dcha();          }
+        else if (message == "latizda") {
+          rover_lat_izda();          }
+        else if (message == "latdcha") {
+          rover_lat_dcha();          }
         else if (message == "stop") {
           rover_stop();          }
         else if (message == "camizda") {
-          angulo_servo_2 += 1;          }
-        else if (message == "camdcha") {
-          angulo_servo_2 -= 1;          }
-        else if (message == "camup") {
-          angulo_servo_1 -= 1;          }
-        else if (message == "camdown") {
           angulo_servo_1 += 1;          }
+        else if (message == "camdcha") {
+          angulo_servo_1 -= 1;          }
+        else if (message == "camarriba") {
+          angulo_servo_2 -= 1;           }
+        else if (message == "camabajo") {
+          angulo_servo_2 += 1;          }
         else if (message == "camstop") {          }
     }
 }
