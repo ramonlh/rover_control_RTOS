@@ -29,8 +29,6 @@ void task_servomotores(void *pvParameters) {
   servos.begin();
   servos.setPWMFreq(50); // 50Hz para servos
   vTaskDelay(pdMS_TO_TICKS(1000)); 
-  Serial.println("Servomotores iniciados");
-  // Variable para almacenar el tiempo de la última ejecución
   TickType_t xLastWakeTime = xTaskGetTickCount();
 
   angulo_servo_1 = 90;
@@ -39,6 +37,6 @@ void task_servomotores(void *pvParameters) {
   while(1) {
     moverServoA(SERVO1_CHANNEL, angulo_servo_1);
     moverServoA(SERVO2_CHANNEL, angulo_servo_2);
-    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(10));
+    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(1));
   }
 }

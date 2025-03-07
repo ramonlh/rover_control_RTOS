@@ -14,7 +14,7 @@ const unsigned long codesRC[num_buttonsRC] = {6047491, 6047500, 6047536, 6047692
 // Variables para el control del tiempo sin señal
 unsigned long ultimoTiempoRC = 0;
 const unsigned long tiempoMaxSinRC = 200;  // Tiempo máximo sin señal en ms
-int ultimo_boton_RC = 0;  // Último botón presionado                                     
+uint8_t ultimo_boton_RC = 0;  // Último botón presionado                                     
 
 // Función para decodificar el código recibido
 int decode_RC(unsigned long codeRC) {
@@ -32,7 +32,7 @@ int lee_RC() {
     unsigned long code = mySwitch.getReceivedValue();
     mySwitch.resetAvailable();
     if (code == 0) return 0; // Código inválido
-    Serial.println(code);
+    //Serial.println(code);
     return decode_RC(code);
   }
   return 0;

@@ -19,101 +19,56 @@ static Output high = Output::High;
 static int rover_speed = 1000;
 int rumbo_adelante=0;
 
-void pinModeMux(int pin, int mode)
-{
-  if (mode == OUTPUT)
-    io_mux.pinMode(pin, Mode::Output);
-  else
-    io_mux.pinMode(pin, Mode::Input);
-}
+int speed_rover = 1000;   // para usar con la task, rover_speed se quitará
+int tipo_mov = 0;     //  f, r, fl,fr,rl,rr,rotl,rotr, latl, latr 
 
 void digitalWriteMux(int pin, int value)
 {
   io_mux.pinDigitalWrite(pin, value==0?low:high);
 }
 
-void set_dir_motor (int motor, int dir)           // motor: 1-4,  direccion: 0-1
-{
-  if (dir == 0)
-    {
-    digitalWriteMux(pin_dir[motor-1][0], LOW);
-    digitalWriteMux(pin_dir[motor-1][1], HIGH);
-    }
-  else
-    {
-    digitalWriteMux(pin_dir[motor-1][0], HIGH);
-    digitalWriteMux(pin_dir[motor-1][1], LOW);
-    }
+void set_dir_motor(int motor, int dir) {
+  digitalWriteMux(pin_dir[motor-1][0], (dir == 0) ? LOW : HIGH);
+  digitalWriteMux(pin_dir[motor-1][1], (dir == 0) ? HIGH : LOW);
 }
 
-void set_motor(int motor, int dir, int speed)  // motor: 1-4, speed: 0-4095
-{
-  if (speed == 0)
-    {
+void set_motor(int motor, int dir, int speed) {
+  if (speed == 0) {   // stop
     digitalWriteMux(pin_dir[motor-1][0], HIGH);
     digitalWriteMux(pin_dir[motor-1][1], HIGH);
     speed_motor.setValue(pin_motor[motor-1], 0);
-    }
-  else
-    {
-    set_dir_motor(motor,dir);
+    } 
+  else {
+    set_dir_motor(motor, dir);
     speed_motor.setValue(pin_motor[motor-1], speed);
-    }
+  }
 }
 
-void set_speed_rover(int velocidad)
-{
-  if (velocidad > 4000)
-    velocidad = 4000;
-  if (velocidad < 600)
-    velocidad = 600;
-  rover_speed = velocidad;
-  for (int i=0; i<4; i++)
-    {
-    speed_motor.setValue(i,   rover_speed);
-    }
+void set_speed_rover(int velocidad) {
+  rover_speed = constrain(velocidad, 500, 4000);
+  for (int i = 0; i < 4; i++) {
+    speed_motor.setValue(i, rover_speed);
+  }
 }
 
-void init_motores()
-{
-
-  Wire.begin(pin_SDA,pin_SCL);    // Initialize I²C
-  init_MCP23017();    // Initialize_MCP23017
-  init_PCA9685(1600);   // 50 = freq   // Initialize_PCA9685
-  
-  for (int i=0; i<4; i++)
-    {
-    speed_motor.setValue(i, 1);
-    pinModeMux(pin_dir[i][0], OUTPUT);
-    pinModeMux(pin_dir[i][1], OUTPUT);
-    digitalWriteMux(pin_dir[i][0], LOW);  // disable
-    digitalWriteMux(pin_dir[i][1], LOW);  // disable
-    }
-  rover_speed = 1000;
+void rover_stop() {
+  for (int i = 1; i <= 4; i++) {
+    set_motor(i, MFORWARD, 0);
+  }
 }
 
-void rover_stop()
-{
-    set_motor(1, MFORWARD, 0);    // motor, sentido giro, velocidad
-    set_motor(2, MFORWARD, 0);    // motor, sentido giro, velocidad
-    set_motor(3, MFORWARD, 0);    // motor, sentido giro, velocidad
-    set_motor(4, MFORWARD, 0);    // motor, sentido giro, velocidad
+void rover_move(int direction) {
+  for (int i = 1; i <= 4; i++) {
+    set_motor(i, direction, rover_speed);
+  }
 }
 
-void rover_adelante()
-{
-    set_motor(1, MFORWARD, rover_speed);    // motor, sentido giro, velocidad
-    set_motor(2, MFORWARD, rover_speed);    // motor, sentido giro, velocidad
-    set_motor(3, MFORWARD, rover_speed);    // motor, sentido giro, velocidad
-    set_motor(4, MFORWARD, rover_speed);    // motor, sentido giro, velocidad
+void rover_adelante() {
+  rover_move(MFORWARD);
 }
 
-void rover_atras()
-{
-    set_motor(1, MBACK, rover_speed);    // motor, sentido giro, velocidad
-    set_motor(2, MBACK, rover_speed);    // motor, sentido giro, velocidad
-    set_motor(3, MBACK, rover_speed);    // motor, sentido giro, velocidad
-    set_motor(4, MBACK, rover_speed);    // motor, sentido giro, velocidad
+void rover_atras() {
+  rover_move(MBACK);
 }
 
 void rover_giro_dcha()
@@ -199,6 +154,50 @@ void conservar_rumbo()
       set_motor(3, 1, rover_speed);  
       set_motor(4, 1, rover_speed);        // girar a la izquierda
     }
+}
 
+void task_motores(void *pvParameters) {
+  Wire.begin(pin_SDA,pin_SCL);    // Initialize I²C
+  init_MCP23017();    // Initialize_MCP23017
+  init_PCA9685(1600);   // 50 = freq   // Initialize_PCA9685
+  for (int i=0; i<4; i++)
+    {
+    speed_motor.setValue(i, 1);
+    io_mux.pinMode(pin_dir[i][0], Mode::Output);
+    io_mux.pinMode(pin_dir[i][1], Mode::Output);
+    digitalWriteMux(pin_dir[i][0], LOW);  // disable
+    digitalWriteMux(pin_dir[i][1], LOW);  // disable
+    }
+  // valores iniciales
+  speed_rover = 1000;   // para usar con la task, rover_speed se quitará
+  tipo_mov = 0;        // dirección a mover el coche 
+
+  vTaskDelay(pdMS_TO_TICKS(1000)); 
+  TickType_t xLastWakeTime = xTaskGetTickCount();
+
+  int last_mov = 0;
+
+  while(1) {
+    // cosas que hacer en la tarea
+    // mover el coche con la velocidad y direccion de speed_rover y dir_rover
+    if (tipo_mov != last_mov)
+      {
+      Serial.println(tipo_mov);
+      last_mov = tipo_mov;
+      }
+    if (tipo_mov == 0) { rover_stop(); }
+    if (tipo_mov == 1) { rover_adelante(); }
+    else if (tipo_mov == 2) { rover_atras(); }
+    else if (tipo_mov == 3) { rover_giro_izda(); }
+    else if (tipo_mov == 4) { rover_giro_dcha(); }
+    else if (tipo_mov == 5) { rover_atras_izda(); }
+    else if (tipo_mov == 6) { rover_atras_dcha(); }
+    else if (tipo_mov == 7) { rover_rot_izda(); }
+    else if (tipo_mov == 8) { rover_rot_dcha(); }
+    else if (tipo_mov == 9) { rover_lat_izda(); }
+    else if (tipo_mov == 10) { rover_lat_dcha(); }
+    // hasta aquí
+    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(1));
+  }
 }
 

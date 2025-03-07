@@ -7,12 +7,12 @@ Bonezegei_PCA9685 speed_motor(0x40);
 void init_PCA9685(int freq)
 {
   if (speed_motor.begin()) {
-    Serial.println("PCA9685 Detectado");
+    Serial.println(F("PCA9685 OK"));
     // Frequency in Hertz 
     speed_motor.setFrequency(freq);
     } 
   else {
-    Serial.println("Error: PCA9685 no Conectado");
+    Serial.println(F("Error:PCA9685"));
     }
 }
 

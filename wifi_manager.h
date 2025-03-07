@@ -6,17 +6,16 @@ bool wm_nonblocking = false; // change to true to use non blocking
 WiFiManager wm; // global wm instance
 WiFiManagerParameter custom_field; // global param ( for non blocking w params )
 
-String getParam(String name){
-  //read parameter from server, for customhmtl input
-  String value;
-  if(wm.server->hasArg(name)) {
-    value = wm.server->arg(name);
+// Función para obtener parámetros desde el servidor
+String getParam(String name) {
+  if (wm.server->hasArg(name)) {
+    return wm.server->arg(name);
   }
-  return value;
+  return "";
 }
 
 void saveParamCallback(){
-  Serial.println("[CALLBACK] saveParamCallback lanzado");
+  Serial.println(F("[CALLBACK] saveParamCallback lanzado"));
   Serial.println("PARAM customfieldid = " + getParam("customfieldid"));
 }
 
@@ -26,27 +25,25 @@ void checkButton(){
     // poor mans debounce/press-hold, code not ideal for production
     delay(50);
     if( digitalRead(WIFI_TRIGGER_PIN) == LOW ){
-      Serial.println("Button Pressed");
-      // still holding button for 3000 ms, reset settings, code not ideaa for production
+      Serial.println(F("Button Pressed"));
       delay(3000); // reset delay hold
       if( digitalRead(WIFI_TRIGGER_PIN) == LOW ){
-        Serial.println("Boton presionado");
-        Serial.println("Borrando configuración, reiniciando");
+        Serial.println(F("Boton presionado. Borrando conf, reinit"));
         wm.resetSettings();
         ESP.restart();
       }
       
       // start portal w delay
-      Serial.println("Iniciando portal configuración");
+      Serial.println(F("Init portal conf"));
       wm.setConfigPortalTimeout(120);
       
       if (!wm.startConfigPortal("OnDemandAP","password")) {
-        Serial.println("No se pudo conectar");
+        Serial.println(F("No se pudo conectar"));
         delay(3000);
         // ESP.restart();
       } else {
         //if you get here you have connected to the WiFi
-        Serial.println("conectado...Bien :)");
+        Serial.println(F("conectado OK"));
       }
     }
   }
@@ -55,7 +52,7 @@ void checkButton(){
 void init_wifi_manager()
 {
   WiFi.mode(WIFI_STA); // explicitly set mode, esp defaults to STA+AP  
-  Serial.println("\n Iniciando WiFi");
+  Serial.println(F("\n Iniciando WiFi"));
   pinMode(WIFI_TRIGGER_PIN, INPUT);
   int customFieldLength = 40;
   // test custom html(radio)
@@ -80,12 +77,12 @@ void init_wifi_manager()
   //res = wm.autoConnect("AutoConnectAP"); // anonymous ap
   //res = wm.autoConnect("AutoConnectAP","password"); // password protected ap
   if(!res) {
-    Serial.println("No se pudo conectar");
+    Serial.println(F("No se pudo conectar"));
     // ESP.restart();
     } 
   else {
     //if you get here you have connected to the WiFi    
-    Serial.println("conectado...Bien :)");
+    Serial.println(F("conectado OK"));
   }
 }  
 

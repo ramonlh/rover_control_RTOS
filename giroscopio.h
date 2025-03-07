@@ -27,13 +27,13 @@ void calibrarGiroscopio() {
 void task_giroscopio(void *pvParameters) {
   JY901.startIIC(i2caddress_giroscopio);
   // Realizar calibración antes de iniciar las lecturas
-  Serial.println("Calibrando giroscopio..."); 
-  calibrarGiroscopio();
-  Serial.println("Calibración completa.");
-  Serial.print("Offsets -> Roll: "); Serial.print(offsetX);
-  Serial.print(" | Pitch: "); Serial.print(offsetY);
-  Serial.print(" | Yaw: "); Serial.println(offsetZ);
-  Serial.println("Giroscopio OK");
+  //Serial.println("Calibrando giroscopio..."); 
+  //calibrarGiroscopio();
+  //Serial.println("Calibración completa.");
+  //Serial.print("Offsets -> Roll: "); Serial.print(offsetX);
+  //Serial.print(" | Pitch: "); Serial.print(offsetY);
+  //Serial.print(" | Yaw: "); Serial.println(offsetZ);
+  Serial.println(F("Giroscopio OK"));
   // Variable para almacenar el tiempo de la última ejecución
   TickType_t xLastWakeTime = xTaskGetTickCount();
   while(1) {
