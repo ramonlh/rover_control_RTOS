@@ -16,10 +16,10 @@ void init_ota()
       }
 
       // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
-      Serial.println("Start updating " + type);
+      Serial.print(F("Start updating "));  Serial.println(type);
     })
     .onEnd([]() {
-      Serial.println("\nEnd");
+      Serial.println(F("\nEnd"));
     })
     .onProgress([](unsigned int progress, unsigned int total) {
       Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
@@ -27,19 +27,19 @@ void init_ota()
     .onError([](ota_error_t error) {
       Serial.printf("Error[%u]: ", error);
       if (error == OTA_AUTH_ERROR) {
-        Serial.println("Auth Failed");
+        Serial.println(F("Auth error"));
       } else if (error == OTA_BEGIN_ERROR) {
-        Serial.println("Begin Failed");
+        Serial.println(F("Begin error"));
       } else if (error == OTA_CONNECT_ERROR) {
-        Serial.println("Connect Failed");
+        Serial.println(F("Connect error"));
       } else if (error == OTA_RECEIVE_ERROR) {
-        Serial.println("Receive Failed");
+        Serial.println(F("Receive error"));
       } else if (error == OTA_END_ERROR) {
-        Serial.println("End Failed");
+        Serial.println(F("End error"));
       }
     });
 
   ArduinoOTA.begin();
-  Serial.println("OTA preparado");
+  Serial.println(F("OTA OK"));
 
 }
