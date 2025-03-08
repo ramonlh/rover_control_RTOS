@@ -34,9 +34,10 @@ void task_ultrasonidos(void *pvParameters) {
     else {
       dUS1 = 200;  // Valor inválido si no se detecta eco
       }
+    //Serial.println(dUS1);
     // Esperar 100 ms antes de la siguiente medición
     //Serial.println(dUS1);
-    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(1000));
+    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(5000));
   }
 }
 
@@ -45,7 +46,6 @@ void handle_obstaculoUS()
   // mirar la distancia del sensor de ultrasonidos
   int distancia = dUS1;
   //delay(5);
-  Serial.println(distancia);
   if (rumbo_adelante == 1)
     {
     if (distancia <= 15)

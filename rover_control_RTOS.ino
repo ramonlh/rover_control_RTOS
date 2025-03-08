@@ -40,7 +40,7 @@ uint32_t time60 = 0;
 void cosas_cada_segundo()
 {
   unixtime++;
-  sendSensorData();  
+  //sendSensorData();  
   time1 = millis();
 }
 
@@ -78,8 +78,10 @@ void handle_serial_commands()
 void setup() {
   Serial.begin(115200);
   // init conexiones y servidores
+
   ini_sistema_ficheros();
   init_wifi_manager();
+
   init_webserver();
   init_websockets();
   init_ota();
@@ -90,6 +92,8 @@ void setup() {
   delay(2000);
   digitalWrite(pin_led_7colores, LOW);
 
+  init_manageips();
+
   xTaskCreate(task_giroscopio, "Task Giros", 2048, NULL, 2, NULL); // comprobado 2048
   xTaskCreate(task_dht11, "Task DHT11", 2048, NULL, 1, NULL); // comprobado 1024
   xTaskCreate(task_ultrasonidos, "Task Ultras", 3000, NULL, 2, NULL); // comprobado 1024
@@ -97,14 +101,17 @@ void setup() {
   xTaskCreate(task_servomotores, "Task Servos", 2048, NULL, 3, NULL); // comprobado 2048
   xTaskCreate(task_motores, "Task Motores", 2048, NULL, 3, NULL); // 
   xTaskCreate(task_radiocontrol, "Task RC", 4000, NULL, 2, NULL); // comprobado 2048
-//  init_manageips();
-
+  
+  // Configura el servidor DNS después de la conexión. Necesario si se usa la librería WiFi_Manager
+  IPAddress dns(8, 8, 8, 8);  // DNS de Google (puedes usar otro)
+  IPAddress subnet(255, 255, 255, 0);  // DNS de Google (puedes usar otro)
+  WiFi.config(WiFi.localIP(), WiFi.gatewayIP(), subnet, dns);  // Establece subnet y DNS  
 }
 
 void loop() {
+
   // Manejo de conexiones y servidores  
   wifimanager_loop();
-  //handle_tcpserver();
   webSocket.loop();
   webserver.handleClient();
   ArduinoOTA.handle();
@@ -123,5 +130,6 @@ void loop() {
 
   // Manejo de comandos por serial
   handle_serial_commands();
-//   manage_ips_loop();
+
+   manage_ips_loop();
 }
