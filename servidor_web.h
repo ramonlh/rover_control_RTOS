@@ -73,23 +73,6 @@ void handle_cochearriba() { handle_image("/carup.jpg"); }
 void handle_cochetrasera() { handle_image("/carback.jpg"); }
 void handle_cochelado() { handle_image("/carside.jpg"); }
 
-void send_IPs()
-{
-  char url[200];
-//  snprintf(url, sizeof(url), "%sip=%s", dweetserverpub, WiFi.localIP().toString().c_str());
-  snprintf(url, sizeof(url),dweetserverpub);
-  HTTPClient http;
-  Serial.println(url);
-  http.begin(url);
-  int httpCode = http.GET();
-  if (httpCode > 0) {
-    Serial.println(F("Datos enviados"));
-  } else {
-    Serial.printf("Error: %d\n", httpCode);
-  }
-  http.end();
-}
-
 void init_webserver()
 {
   webserver.on("/", handle_index); 
@@ -103,7 +86,5 @@ void init_webserver()
   webserver.onNotFound(handle_NotFound); 
   webserver.begin();
   Serial.println(F("HTTP OK"));
-
-  //send_IPs();
 }
 

@@ -79,7 +79,6 @@ const char head_1[] PROGMEM =    // cabeceras
     "<p><span id=\"dUS1\">--</span>cm</p>"
     "<button id=controlButton5 onmousedown=\"mvRover('fl')\" onmouseup=\"stopRover('stop')\">Giro Izda</button>\n"
     "<button id=controlButton6 onmousedown=\"mvRover('f')\" onmouseup=\"stopRover()\">Adelante</button>\n"
-//    "<button id=controlButton6 onmousedown=\"sCom('f')\" onmouseup=\"stopMove('stop')\">Adelante</button>\n"
     "<button id=controlButton7 onmousedown=\"mvRover('fr')\" onmouseup=\"stopRover()\">Giro Dcha</button><br>\n"
     "<div style=\"display: flex; align-items: center; justify-content: center; gap: 5px;\">"
       "<div><button id=controlButton8 onmousedown=\"mvRover('latl')\" onmouseup=\"stopRover()\">Lat Izda</button></div>\n"
@@ -168,7 +167,7 @@ const char script_01[] PROGMEM =
             "wave.style.width=`${40+sizeFactor*60}px`;" // Establecer el tamaño de la onda
             "wave.style.height=`${20+sizeFactor*30}px`;}" 
           "else {"
-              "wave.style.opacity = 0;}"
+            "wave.style.opacity = 0;}"
           "}"
         "}"
 
@@ -198,16 +197,12 @@ const char script_01[] PROGMEM =
           "if (ws && ws.readyState === WebSocket.OPEN) {"
             "if (command === 'stop') {"
               "clearInterval(moveInterval);" // Si el comando es 'stop', detén el intervalo y envía el comando de parada
-              "ws.send(command);"
-              "}"
+              "ws.send(command);}"
             "else"
-              "{"
-              "ws.send(command);"  // Para otros comandos, envíalos directamente
-              "}"
+              "{ws.send(command);}" // Para otros comandos, envíalos directamente
             "}"
           "else {"
-            "console.error(\"WS Off\");"
-            "}"
+            "console.error(\"WS Off\");}"
           "}"
 
     // Cambiar la velocidad
@@ -242,16 +237,14 @@ const char script_01[] PROGMEM =
       // Continuar enviando comandos cada 50 ms mientras el botón esté presionado
       "mvInt = setInterval(() => {sCom(command);},50);}"
 
-    "function stopServo() {"
-      "clearInterval(mvInt);sCom('camstop');}" // Enviar comando de detener el servo
+    "function stopServo() {clearInterval(mvInt);sCom('camstop');}" // Enviar comando de detener el servo
 
     "function mvRover(command) {"
       "sCom(command);\n" // Iniciar movimiento al presionar el botón
       // Continuar enviando comandos cada 50 ms mientras el botón esté presionado
       "mvInt = setInterval(() => {sCom(command);},50);}"
 
-    "function stopRover() {"
-      "clearInterval(mvInt);sCom('stop');}" // Enviar comando de detener el rover
+    "function stopRover() {clearInterval(mvInt);sCom('stop');}" // Enviar comando de detener el rover
 
     "function upInd(t,h,a,e,g) {"
       "document.getElementById(\"carazim\").style.transform=`rotate(${a}deg)`;"
