@@ -25,7 +25,7 @@
 #include "servidor_ftp.h"
 #include "radio_control.h"
 #include "radar.h"
-//#include "pantalla.h"
+#include "manage_ips.h"
 
 #define OFF LOW
 #define ON HIGH
@@ -90,13 +90,15 @@ void setup() {
   delay(2000);
   digitalWrite(pin_led_7colores, LOW);
 
-  xTaskCreate(task_radiocontrol, "Task RC", 2048, NULL, 2, NULL); // comprobado 2048
   xTaskCreate(task_giroscopio, "Task Giros", 2048, NULL, 2, NULL); // comprobado 2048
-  xTaskCreate(task_dht11, "Task DHT11", 2048, NULL, 1, NULL); // comprobado 1024
-  xTaskCreate(task_ultrasonidos, "Task Ultras", 2048, NULL, 2, NULL); // comprobado 1024
-  xTaskCreate(task_radar, "Task Radar", 1024, NULL, 1, NULL); // comprobado 1024
+  //xTaskCreate(task_dht11, "Task DHT11", 2048, NULL, 1, NULL); // comprobado 1024
+  //xTaskCreate(task_ultrasonidos, "Task Ultras", 2048, NULL, 2, NULL); // comprobado 1024
+  //xTaskCreate(task_radar, "Task Radar", 1024, NULL, 1, NULL); // comprobado 1024
   xTaskCreate(task_servomotores, "Task Servos", 2048, NULL, 3, NULL); // comprobado 2048
   xTaskCreate(task_motores, "Task Motores", 2048, NULL, 3, NULL); // 
+  xTaskCreate(task_radiocontrol, "Task RC", 4000, NULL, 2, NULL); // comprobado 2048
+//  init_manageips();
+
 }
 
 void loop() {
@@ -121,5 +123,5 @@ void loop() {
 
   // Manejo de comandos por serial
   handle_serial_commands();
-
+//   manage_ips_loop();
 }

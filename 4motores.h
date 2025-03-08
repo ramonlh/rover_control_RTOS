@@ -1,4 +1,3 @@
-
 #include "mcp23017.h"
 #include <pca9685.h>
 
@@ -20,7 +19,7 @@ static int rover_speed = 1000;
 int rumbo_adelante=0;
 
 int speed_rover = 1000;   // para usar con la task, rover_speed se quitará
-int tipo_mov = 0;     //  f, r, fl,fr,rl,rr,rotl,rotr, latl, latr 
+int tipo_mov = 99;     //  f, r, fl,fr,rl,rr,rotl,rotr, latl, latr 
 
 void digitalWriteMux(int pin, int value)
 {
@@ -156,48 +155,118 @@ void conservar_rumbo()
     }
 }
 
+volatile int control_activo = 0; // 0: Ninguno, 1: WebSockets, 2: Radiocontrol
+
 void task_motores(void *pvParameters) {
-  Wire.begin(pin_SDA,pin_SCL);    // Initialize I²C
-  init_MCP23017();    // Initialize_MCP23017
-  init_PCA9685(1600);   // 50 = freq   // Initialize_PCA9685
-  for (int i=0; i<4; i++)
-    {
+  Wire.begin(pin_SDA, pin_SCL);
+  init_MCP23017();
+  init_PCA9685(1600);
+
+  for (int i = 0; i < 4; i++) {
     speed_motor.setValue(i, 1);
     io_mux.pinMode(pin_dir[i][0], Mode::Output);
     io_mux.pinMode(pin_dir[i][1], Mode::Output);
-    digitalWriteMux(pin_dir[i][0], LOW);  // disable
-    digitalWriteMux(pin_dir[i][1], LOW);  // disable
-    }
-  // valores iniciales
-  speed_rover = 1000;   // para usar con la task, rover_speed se quitará
-  tipo_mov = 0;        // dirección a mover el coche 
+    digitalWriteMux(pin_dir[i][0], LOW);
+    digitalWriteMux(pin_dir[i][1], LOW);
+  }
 
-  vTaskDelay(pdMS_TO_TICKS(1000)); 
+  speed_rover = 1000;
+  tipo_mov = 99;
+
+  vTaskDelay(pdMS_TO_TICKS(1000));
   TickType_t xLastWakeTime = xTaskGetTickCount();
 
   int last_mov = 0;
 
-  while(1) {
-    // cosas que hacer en la tarea
-    // mover el coche con la velocidad y direccion de speed_rover y dir_rover
-    if (tipo_mov != last_mov)
-      {
-      Serial.println(tipo_mov);
+  while (1) {
+    if (tipo_mov != last_mov) {
       last_mov = tipo_mov;
-      }
-    if (tipo_mov == 0) { rover_stop(); }
-    if (tipo_mov == 1) { rover_adelante(); }
-    else if (tipo_mov == 2) { rover_atras(); }
-    else if (tipo_mov == 3) { rover_giro_izda(); }
-    else if (tipo_mov == 4) { rover_giro_dcha(); }
-    else if (tipo_mov == 5) { rover_atras_izda(); }
-    else if (tipo_mov == 6) { rover_atras_dcha(); }
-    else if (tipo_mov == 7) { rover_rot_izda(); }
-    else if (tipo_mov == 8) { rover_rot_dcha(); }
-    else if (tipo_mov == 9) { rover_lat_izda(); }
-    else if (tipo_mov == 10) { rover_lat_dcha(); }
-    // hasta aquí
+    }
+    //Serial.println(tipo_mov);
+    // Detener el rover si el tipo_mov es 0 (WebSockets) o 50 (RF cuando no es control activo)
+    if ((tipo_mov == 0 || tipo_mov == 50) && control_activo != 2) {
+      rover_stop();
+    } else if ((tipo_mov == 1) || (tipo_mov == 51)) {
+      rover_adelante();
+    } else if ((tipo_mov == 2) || (tipo_mov == 52)) {
+      rover_atras();
+    } else if ((tipo_mov == 3) || (tipo_mov == 53)) {
+      rover_giro_izda();
+    } else if ((tipo_mov == 4) || (tipo_mov == 54)) {
+      rover_giro_dcha();
+    } else if ((tipo_mov == 5) || (tipo_mov == 55)) {
+      rover_atras_izda();
+    } else if ((tipo_mov == 6) || (tipo_mov == 56)) {
+      rover_atras_dcha();
+    } else if ((tipo_mov == 7) || (tipo_mov == 57)) {
+      rover_rot_izda();
+    } else if ((tipo_mov == 8) || (tipo_mov == 58)) {
+      rover_rot_dcha();
+    } else if ((tipo_mov == 9) || (tipo_mov == 59)) {
+      rover_lat_izda();
+    } else if ((tipo_mov == 10) || (tipo_mov == 60)) {
+      rover_lat_dcha();
+    }
+
     vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(1));
   }
 }
 
+/*
+void task_motores(void *pvParameters) {
+  Wire.begin(pin_SDA, pin_SCL);
+  init_MCP23017();
+  init_PCA9685(1600);
+
+  for (int i = 0; i < 4; i++) {
+    speed_motor.setValue(i, 1);
+    io_mux.pinMode(pin_dir[i][0], Mode::Output);
+    io_mux.pinMode(pin_dir[i][1], Mode::Output);
+    digitalWriteMux(pin_dir[i][0], LOW);
+    digitalWriteMux(pin_dir[i][1], LOW);
+  }
+
+  speed_rover = 1000;
+  tipo_mov = 99;
+
+  vTaskDelay(pdMS_TO_TICKS(1000));
+  TickType_t xLastWakeTime = xTaskGetTickCount();
+
+  int last_mov = 0;
+
+  while (1) {
+    //Serial.print("tipo_mov:"); Serial.println(tipo_mov);
+
+    if (tipo_mov != last_mov) {
+      last_mov = tipo_mov;
+    }
+
+    // Solo detener si el control es WebSockets o ninguno
+    if ((tipo_mov == 50) && (control_activo != 2)) {
+      rover_stop();
+    } else if ((tipo_mov == 1) || (tipo_mov == 51)) {
+      rover_adelante();
+    } else if ((tipo_mov == 2) || (tipo_mov == 52)) {
+      rover_atras();
+    } else if ((tipo_mov == 3) || (tipo_mov == 53)) {
+        rover_giro_izda();
+      } else if ((tipo_mov == 4) || (tipo_mov == 54)) {
+        rover_giro_dcha();
+      } else if ((tipo_mov == 5) || (tipo_mov == 55)) {
+        rover_atras_izda();
+      } else if ((tipo_mov == 6) || (tipo_mov == 56)) {
+        rover_atras_dcha();
+      } else if ((tipo_mov == 7) || (tipo_mov == 57)) {
+        rover_rot_izda();
+      } else if ((tipo_mov == 8) || (tipo_mov == 58)) {
+        rover_rot_dcha();
+      } else if ((tipo_mov == 9) || (tipo_mov == 59)) {
+        rover_lat_izda();
+      } else if ((tipo_mov == 10) || (tipo_mov == 60)) {
+        rover_lat_dcha();
+      }
+
+      vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(1));
+    }
+  }
+*/
