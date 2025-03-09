@@ -37,6 +37,6 @@ void task_servomotores(void *pvParameters) {
   while(1) {
     moverServoA(SERVO1_CHANNEL, angulo_servo_1);
     moverServoA(SERVO2_CHANNEL, angulo_servo_2);
-    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(1));
+    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(periodo_task_servomotores));
   }
 }

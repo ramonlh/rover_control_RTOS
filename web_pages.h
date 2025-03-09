@@ -65,7 +65,10 @@ const char head_1[] PROGMEM =    // cabeceras
     "<button id=controlButton1 onmousedown=\"mvServo('camup')\" onmouseup=\"stopServo()\">&#9650;</button><br>"
     "<div style=\"display: flex; align-items: center; justify-content: center; gap: 5px;\">"
       "<div><button id=controlButton2 onmousedown=\"mvServo('caml')\" onmouseup=\"stopServo()\">&#9664;</button>\n</div>"
-      "<div><img id=\"streamImg\" src=\"http://192.168.11.92:81/stream\" alt=\"cam\" width=\"320\" height=\"240\" ></div>"
+      "<div><img id=\"streamImg\" src=\"http://";
+  // aquí se inserta la variable other_ip  "192.168.11.92"
+const char head_2[] PROGMEM =    // cabeceras
+      ":81/stream\" alt=\"cam\" width=\"320\" height=\"240\" ></div>"
       "<div><button id=controlButton3 onmousedown=\"mvServo('camr')\" onmouseup=\"stopServo()\">&#9654;</button></div>"
     "</div>"
     "<button id=controlButton4 onmousedown=\"mvServo('camdn')\" onmouseup=\"stopServo()\">&#9660;</button><br>\n"

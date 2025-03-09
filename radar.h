@@ -21,7 +21,6 @@ void task_radar(void *pvParameters) {
      {
      //digitalWrite(pin_led_7colores, LOW);
      }  
-
-    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(1000));
+    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(periodo_task_radar));
   }
 }

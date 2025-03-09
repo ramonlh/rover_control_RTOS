@@ -5,16 +5,6 @@ WebSocketsServer webSocket = WebSocketsServer(PORT_WEBSOCKET); // #define port_w
 #define JSON_BUFFER_SIZE 128
 char jsonBuffer[JSON_BUFFER_SIZE]; // Buffer estático para JSON
 
-void sendSensorData() {
-  if (webSocket.connectedClients() > 0) { // Solo enviar si hay clientes conectados
-    // Crear el JSON usando un buffer estático
-    snprintf(jsonBuffer, JSON_BUFFER_SIZE, "{\"t\":%.2f, \"h\":%.2f, \"a\":%.2f, \"e\":%.2f, \"g\":%.2f, \"dUS1\":%ld}",
-             valores_DHT11.temperature, valores_DHT11.humidity, angleZ, angleY, angleX, dUS1);
-    // Enviar los datos a todos los clientes conectados
-    webSocket.broadcastTXT(jsonBuffer);
-  }
-}
-
 // Manejar mensajes de WebSocket
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length) {
   if (type == WStype_TEXT) {
@@ -42,8 +32,30 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
 }
 void init_websockets()
 {
+ // webSocket.begin();
+ // webSocket.onEvent(webSocketEvent);
+ // Serial.println(F("WS Ok"));
+}
+
+void sendSensorData() {
+  if (webSocket.connectedClients() > 0) { // Solo enviar si hay clientes conectados
+    // Crear el JSON usando un buffer estático
+    snprintf(jsonBuffer, JSON_BUFFER_SIZE, "{\"t\":%.2f, \"h\":%.2f, \"a\":%.2f, \"e\":%.2f, \"g\":%.2f, \"dUS1\":%ld}",
+             valores_DHT11.temperature, valores_DHT11.humidity, angleZ, angleY, angleX, dUS1);
+    // Enviar los datos a todos los clientes conectados
+    webSocket.broadcastTXT(jsonBuffer);
+    Serial.print("sendSensorData:"); Serial.println(jsonBuffer);
+  }
+}
+
+void task_websockets(void *pvParameters) {
   webSocket.begin();
   webSocket.onEvent(webSocketEvent);
   Serial.println(F("WS Ok"));
+  TickType_t xLastWakeTime = xTaskGetTickCount();
+  while(1) {
+    sendSensorData();
+    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(periodo_task_websockets));
+  }
 }
 

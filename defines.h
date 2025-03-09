@@ -30,4 +30,31 @@ constexpr char password_OTA[] = "1892";  // Mejor con array de caracteres
 
 constexpr uint8_t i2caddress_giroscopio = 0x50;
 
+// parámetros tareas
+const int periodo_task_DHT11 = 10000;
+const int periodo_task_radar = 1000;
+const int periodo_task_ultrasonidos = 500;
+const int periodo_task_radiocontrol = 10;
+const int periodo_task_giroscopio = 500;
+const int periodo_task_websockets = 500;
+const int periodo_task_servomotores = 100;
+const int periodo_task_motores = 100;
+
+const int prioridad_task_DHT = 1;           // a mayor número, más priorida de la tarea
+const int prioridad_task_radar = 1;
+const int prioridad_task_ultrasonidos= 2;
+const int prioridad_task_radiocontrol = 2;
+const int prioridad_task_giroscopio = 3;
+const int prioridad_task_websockets = 3;
+const int prioridad_task_servomotores = 3;
+const int prioridad_task_motores = 3;
+
+const int tamano_task_DHT = 2048;
+const int tamano_task_radar = 1024;
+const int tamano_task_ultrasonidos= 2048;
+const int tamano_task_radiocontrol = 4000;
+const int tamano_task_giroscopio = 2048;
+const int tamano_task_websockets = 4000;
+const int tamano_task_servomotores = 2048;
+const int tamano_task_motores = 2048;
 

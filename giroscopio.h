@@ -45,12 +45,12 @@ void task_giroscopio(void *pvParameters) {
       angleZ = -angleZ;
     else
       angleZ = 360 - angleZ;
-    // Esperar hasta que haya pasado 1000 ms desde la última ejecución
-   // Serial.print("angle X/Y/Z: "); 
-   // Serial.print(angleX); Serial.print("/");
-   // Serial.print(angleY); Serial.print("/");
-   // Serial.println(angleZ);
-    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(1000));
+    // Esperar hasta que hayan pasado 1000 ms desde la última ejecución
+    Serial.print("angle X/Y/Z: "); 
+    Serial.print(angleX); Serial.print("/");
+    Serial.print(angleY); Serial.print("/");
+    Serial.println(angleZ);
+    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(periodo_task_giroscopio));
   }
 }
 
