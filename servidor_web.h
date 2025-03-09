@@ -5,6 +5,8 @@
 
 WebServer webserver(PORT_WEBSERVER);    // #define port_servidor_web 91
 
+char other_ip[16]; // 
+
 const char* dweetserverpub PROGMEM = "http://dweet.io/dweet/for/roverdiego?ip=192.168.x.x"; // IP o dirección del servidor MQTT
 //WiFiClient espClient;
 
@@ -12,6 +14,8 @@ String SendHTML(bool refrescar) {
     // Cabecera de todas las paginas WEB
   String ptr = "";
   ptr += head_1;
+  ptr += String(other_ip);
+  ptr += head_2;
   ptr += script_01;
   return ptr;
 }

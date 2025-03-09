@@ -37,7 +37,7 @@ void task_ultrasonidos(void *pvParameters) {
     //Serial.println(dUS1);
     // Esperar 100 ms antes de la siguiente medición
     //Serial.println(dUS1);
-    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(5000));
+    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(periodo_task_ultrasonidos));
   }
 }
 

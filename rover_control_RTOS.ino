@@ -47,7 +47,6 @@ void cosas_cada_segundo()
 void cosas_cada_10segundos()
 {
   //sendSensorData();  
-  //send_IPs();
   time10 = millis();
 }
 
@@ -83,7 +82,7 @@ void setup() {
   init_wifi_manager();
 
   init_webserver();
-  init_websockets();
+  //init_websockets();
   init_ota();
   init_ftp_server();
 
@@ -94,18 +93,20 @@ void setup() {
 
   init_manageips();
 
-  xTaskCreate(task_giroscopio, "Task Giros", 2048, NULL, 2, NULL); // comprobado 2048
-  xTaskCreate(task_dht11, "Task DHT11", 2048, NULL, 1, NULL); // comprobado 1024
-  xTaskCreate(task_ultrasonidos, "Task Ultras", 3000, NULL, 2, NULL); // comprobado 1024
-  xTaskCreate(task_radar, "Task Radar", 1024, NULL, 1, NULL); // comprobado 1024
-  xTaskCreate(task_servomotores, "Task Servos", 2048, NULL, 3, NULL); // comprobado 2048
-  xTaskCreate(task_motores, "Task Motores", 2048, NULL, 3, NULL); // 
-  xTaskCreate(task_radiocontrol, "Task RC", 4000, NULL, 2, NULL); // comprobado 2048
+  xTaskCreate(task_dht11, "Task DHT11", tamano_task_DHT, NULL, prioridad_task_DHT, NULL); // comprobado 1024
+  xTaskCreate(task_radar, "Task Radar", tamano_task_radar, NULL, prioridad_task_radar, NULL); // comprobado 1024
+  xTaskCreate(task_ultrasonidos, "Task UltraS", tamano_task_ultrasonidos, NULL, prioridad_task_ultrasonidos, NULL); // comprobado 1024
+  xTaskCreate(task_radiocontrol, "Task RC", tamano_task_radiocontrol, NULL, prioridad_task_radiocontrol, NULL); // comprobado 2048
+  xTaskCreate(task_giroscopio, "Task Giros", tamano_task_giroscopio, NULL, prioridad_task_giroscopio, NULL); // comprobado 2048
+  xTaskCreate(task_websockets, "Task WS", tamano_task_websockets, NULL, prioridad_task_websockets, NULL); // comprobado 2048
+  xTaskCreate(task_servomotores, "Task Servos", tamano_task_servomotores, NULL, prioridad_task_servomotores, NULL); // comprobado 2048
+  xTaskCreate(task_motores, "Task tamano_task_motores", tamano_task_motores, NULL, prioridad_task_motores, NULL); // 
   
   // Configura el servidor DNS después de la conexión. Necesario si se usa la librería WiFi_Manager
   IPAddress dns(8, 8, 8, 8);  // DNS de Google (puedes usar otro)
   IPAddress subnet(255, 255, 255, 0);  // DNS de Google (puedes usar otro)
   WiFi.config(WiFi.localIP(), WiFi.gatewayIP(), subnet, dns);  // Establece subnet y DNS  
+  send_and_get_ips();
 }
 
 void loop() {
@@ -118,18 +119,15 @@ void loop() {
   ftpSrv.handleFTP();
   
   // Manejo de sensores y actuadores
-  handle_obstaculoUS();
-
+  //handle_obstaculoUS();   // mira la distancia y controla si hay que parar el coche
   if ((rumbo_adelante==1) || (rumbo_adelante==2))
     {
-    conservar_rumbo();
+    //conservar_rumbo();
     }
-
   // Tareas periódicas
   handle_tareas_periodicas();
-
   // Manejo de comandos por serial
   handle_serial_commands();
 
-   manage_ips_loop();
+  manage_ips_loop();
 }

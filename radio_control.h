@@ -75,7 +75,7 @@ void task_radiocontrol(void *pvParameters)
       control_activo = 0;
     }
     
-    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(10));
+    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(periodo_task_radiocontrol));
   }
 }
 
