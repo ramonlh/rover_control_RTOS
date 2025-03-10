@@ -9,9 +9,7 @@ const int num_buttonsRC = 16;   // Número de botones del mando
 const unsigned long codesRC[num_buttonsRC] = {6047491, 6047500, 6047536, 6047692, 6047695, 6047548, 6047551, 6047728,
                                      6047683, 6047503, 6047740, 6047731, 6047743, 6047680, 6047539, 6047488};
 
-//volatile int tipo_mov = 50; // Estado inicial detenido
-volatile unsigned long ultima_senal_RC = 0; // Tiempo de la última señal recibida
-//volatile int control_activo = 0; // 0: Ninguno, 1: WebSockets, 2: Radiocontrol
+unsigned long ultima_senal_RC = 0; // Tiempo de la última señal recibida
 
 // Función para decodificar el código recibido
 int decode_RC(unsigned long codeRC) {
@@ -38,7 +36,9 @@ void task_radiocontrol(void *pvParameters)
 {  
   mySwitch.enableReceive(pin_radio_control);  
   TickType_t xLastWakeTime = xTaskGetTickCount();
-  Serial.println("RC Ok");
+  #ifdef DEBUG
+    Serial.println("RC Ok");
+  #endif
   
   while (1) { // La tarea nunca debe salir
     int boton_RC = lee_RC();
@@ -73,8 +73,7 @@ void task_radiocontrol(void *pvParameters)
     if (millis() - ultima_senal_RC > 200 && control_activo == 2) {
       tipo_mov = 50;
       control_activo = 0;
-    }
-    
+      }
     vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(periodo_task_radiocontrol));
   }
 }

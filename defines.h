@@ -52,9 +52,9 @@ const int prioridad_task_motores = 3;
 const int tamano_task_DHT = 2048;
 const int tamano_task_radar = 1024;
 const int tamano_task_ultrasonidos= 2048;
-const int tamano_task_radiocontrol = 4000;
+const int tamano_task_radiocontrol = 2048;
 const int tamano_task_giroscopio = 2048;
-const int tamano_task_websockets = 4000;
+const int tamano_task_websockets = 3000;
 const int tamano_task_servomotores = 2048;
-const int tamano_task_motores = 2048;
+const int tamano_task_motores = 3000;
 

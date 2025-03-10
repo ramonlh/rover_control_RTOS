@@ -10,13 +10,14 @@ WiFiManagerParameter custom_field; // global param ( for non blocking w params )
 String getParam(String name) {
   if (wm.server->hasArg(name)) {
     return wm.server->arg(name);
-  }
+    }
   return "";
 }
 
 void saveParamCallback(){
-  Serial.println(F("[CALLBACK] saveParamCallback lanzado"));
-  Serial.println("PARAM customfieldid = " + getParam("customfieldid"));
+  Serial.println(F("[CALLBACK] saveParamCallback Ok"));
+  Serial.print(F("PARAM customfieldid = "));
+  Serial.println(getParam("customfieldid"));
 }
 
 void checkButton(){
@@ -25,25 +26,35 @@ void checkButton(){
     // poor mans debounce/press-hold, code not ideal for production
     delay(50);
     if( digitalRead(WIFI_TRIGGER_PIN) == LOW ){
-      Serial.println(F("Button Pressed"));
+      #ifdef DEBUG
+        Serial.println(F("Button Pressed"));
+      #endif
       delay(3000); // reset delay hold
       if( digitalRead(WIFI_TRIGGER_PIN) == LOW ){
-        Serial.println(F("Boton presionado. Borrando conf, reinit"));
+        #ifdef DEBUG
+          Serial.println(F("Boton pres.. Borrando conf. reinit"));
+        #endif
         wm.resetSettings();
         ESP.restart();
       }
       
       // start portal w delay
-      Serial.println(F("Init portal conf"));
+      #ifdef DEBUG
+        Serial.println(F("Init portal conf"));
+      #endif
       wm.setConfigPortalTimeout(120);
       
       if (!wm.startConfigPortal("OnDemandAP","password")) {
-        Serial.println(F("No se pudo conectar"));
+        #ifdef DEBUG
+          Serial.println(F("No se pudo conectar"));
+        #endif
         delay(3000);
         // ESP.restart();
       } else {
         //if you get here you have connected to the WiFi
-        Serial.println(F("conectado OK"));
+        #ifdef DEBUG
+          Serial.println(F("conectado OK"));
+        #endif
       }
     }
   }
@@ -52,11 +63,13 @@ void checkButton(){
 void init_wifi_manager()
 {
   WiFi.mode(WIFI_STA); // explicitly set mode, esp defaults to STA+AP  
-  Serial.println(F("\n Iniciando WiFi"));
+  #ifdef DEBUG  
+    Serial.println(F("\n Iniciando WiFi"));
+  #endif
   pinMode(WIFI_TRIGGER_PIN, INPUT);
   int customFieldLength = 40;
   // test custom html(radio)
-  const char* custom_radio_str = "<br/><label for='customfieldid'>Custom Field Label</label><input type='radio' name='customfieldid' value='1' checked> One<br><input type='radio' name='customfieldid' value='2'> Two<br><input type='radio' name='customfieldid' value='3'> Three";
+  const char* custom_radio_str = "<br/><label for='customfieldid'>Custom Field</label><input type='radio' name='customfieldid' value='1' checked> One<br><input type='radio' name='customfieldid' value='2'> Two<br><input type='radio' name='customfieldid' value='3'> Three";
   new (&custom_field) WiFiManagerParameter(custom_radio_str); // custom html input
   
   wm.addParameter(&custom_field);
@@ -76,14 +89,16 @@ void init_wifi_manager()
   res = wm.autoConnect(); // auto generated AP name from chipid ESPxxxxx
   //res = wm.autoConnect("AutoConnectAP"); // anonymous ap
   //res = wm.autoConnect("AutoConnectAP","password"); // password protected ap
-  if(!res) {
-    Serial.println(F("No se pudo conectar"));
-    // ESP.restart();
-    } 
-  else {
-    //if you get here you have connected to the WiFi    
-    Serial.println(F("conectado OK"));
-  }
+  #ifdef DEBUG 
+    if(!res) {
+      Serial.println(F("No se pudo conectar"));
+      // ESP.restart();
+      } 
+    else {
+      //if you get here you have connected to the WiFi    
+      Serial.println(F("conectado OK"));
+    }
+  #endif
 }  
 
 void wifimanager_loop()

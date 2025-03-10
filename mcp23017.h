@@ -19,7 +19,7 @@ void init_MCP23017()
 {
   // Check if the MCP23017 is connected
   if (!io_mux.isConnected()) {
-    Serial.println(F("MCP23017 error"));
+    Serial.println(F("MCP23017 Error"));
     }
   else
     {
@@ -28,12 +28,16 @@ void init_MCP23017()
     if (status != Status::Ok) {
       printerror(status);
       }
-    Serial.println(F("MCP23017 Ok"));
+    #ifdef DEBUG
+      Serial.println(F("MCP23017 Ok"));
+    #endif
   
     // Set pin modes
     status = io_mux.pinMode(BUTTON_PIN, Mode::Input, LED_PIN, Mode::Output);
     if (status != Status::Ok) { printerror(status); }
-    Serial.println(F("Pin modes set"));
+    #ifdef DEBUG
+      Serial.println(F("Pin modes set"));
+    #endif
     status = io_mux.pinPullUp(BUTTON_PIN, PullUp::Enable);
     if (status != Status::Ok) { printerror(status); }
     }

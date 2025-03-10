@@ -26,20 +26,16 @@ void init_ota()
     })
     .onError([](ota_error_t error) {
       Serial.printf("Error[%u]: ", error);
-      if (error == OTA_AUTH_ERROR) {
-        Serial.println(F("Auth error"));
-      } else if (error == OTA_BEGIN_ERROR) {
-        Serial.println(F("Begin error"));
-      } else if (error == OTA_CONNECT_ERROR) {
-        Serial.println(F("Connect error"));
-      } else if (error == OTA_RECEIVE_ERROR) {
-        Serial.println(F("Receive error"));
-      } else if (error == OTA_END_ERROR) {
-        Serial.println(F("End error"));
-      }
+      if (error == OTA_AUTH_ERROR) { Serial.println(F("Auth")); } 
+      else if (error == OTA_BEGIN_ERROR) { Serial.println(F("Begin")); } 
+      else if (error == OTA_CONNECT_ERROR) { Serial.println(F("Connect")); } 
+      else if (error == OTA_RECEIVE_ERROR) { Serial.println(F("Receive")); } 
+      else if (error == OTA_END_ERROR) { Serial.println(F("End")); }
     });
 
   ArduinoOTA.begin();
-  Serial.println(F("OTA OK"));
+  #ifdef DEBUG
+    Serial.println(F("OTA OK"));
+  #endif
 
 }
