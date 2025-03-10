@@ -8,7 +8,9 @@ RCWL0516 radar(pin_radar);
 void task_radar(void *pvParameters) {
   // Initialize sensor radar
   radar.activate();
-	Serial.println(F("Radar OK"));  
+  #ifdef DEBUG
+  	Serial.println(F("Radar OK"));  
+  #endif
 
   TickType_t xLastWakeTime = xTaskGetTickCount();
   while(1) {

@@ -9,11 +9,11 @@ unsigned long last_time;
 //#define I_AM_CAM   // descomentar esto para el programa de la cámara CameraWebServer.ino
 
 #ifdef I_AM_SERVER
-  const char* urlsend = "http://dweet.io/dweet/for/roverdiegoipserver?ip=";
-  const char* urlget = "http://dweet.io/get/latest/dweet/for/roverdiegoipcam";
+  const char* urlsend PROGMEM = "http://dweet.io/dweet/for/roverdiegoipserver?ip="; 
+  const char* urlget  PROGMEM = "http://dweet.io/get/latest/dweet/for/roverdiegoipcam";
 #else
-  const char* urlsend = "http://dweet.io/dweet/for/roverdiegoipcam?ip=";
-  const char* urlget = "http://dweet.io/get/latest/dweet/for/roverdiegoipserver";
+  const char* urlsend PROGMEM = "http://dweet.io/dweet/for/roverdiegoipcam?ip=";
+  const char* urlget PROGMEM = "http://dweet.io/get/latest/dweet/for/roverdiegoipserver";
 #endif
 
 
@@ -35,7 +35,9 @@ void send_IPs()
       }
     } 
   else {
-    Serial.printf(F("HTTP error: %s\n"), http.errorToString(httpCode).c_str());
+    #ifdef DEBUG
+      Serial.printf(F("HTTP error: %s\n"), http.errorToString(httpCode).c_str());
+    #endif
     }
   http.end();
 }
@@ -54,8 +56,10 @@ void get_IPs()
       StaticJsonDocument<200> doc;  // Ajusta el tamaño si el JSON es más grande
       DeserializationError error = deserializeJson(doc, payload.c_str()); // Convertir String a const char*
       if (error) {
-        Serial.print(F("Error parse JSON: "));
-        Serial.println(error.c_str());
+        #ifdef DEBUG
+          Serial.print(F("Error parse JSON: "));
+          Serial.println(error.c_str());
+        #endif
         return;
         }
       // Extraer la IP
@@ -65,12 +69,16 @@ void get_IPs()
         other_ip[15] = '\0'; // Asegurar terminación segura        
         } 
       else {
-        Serial.println(F("No se encontró la IP"));
+        #ifdef DEBUG
+          Serial.println(F("No se encontró la IP"));
+        #endif
         }
       }
     } 
   else {
-    Serial.printf(F("HTTP error: %s\n"), http.errorToString(httpCode).c_str());
+    #ifdef DEBUG
+      Serial.printf(F("HTTP error: %s\n"), http.errorToString(httpCode).c_str());
+    #endif
     }
   http.end();
 }
@@ -79,7 +87,9 @@ void send_and_get_ips()
 {
   send_IPs();
   get_IPs();
-  Serial.print(F("other_ip:")); Serial.println(other_ip);
+  #ifdef DEBUG
+    Serial.print(F("other_ip:")); Serial.println(other_ip);
+  #endif
 }
 
 void manage_ips_loop()

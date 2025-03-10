@@ -5,6 +5,7 @@ float angleX = 0.0, angleY = 0.0, angleZ = 0.0;
 float offsetX = 0.0, offsetY = 0.0, offsetZ = 0.0;
 float rumbo_objetivo;
 
+/*
 // Función para calibrar el giroscopio
 void calibrarGiroscopio() {
   int num_muestras = 100;
@@ -22,6 +23,7 @@ void calibrarGiroscopio() {
   offsetY = sumY / num_muestras;
   offsetZ = sumZ / num_muestras;
 }
+*/
 
 // Definir la función que se ejecutará en la tarea
 void task_giroscopio(void *pvParameters) {
@@ -33,7 +35,9 @@ void task_giroscopio(void *pvParameters) {
   //Serial.print("Offsets -> Roll: "); Serial.print(offsetX);
   //Serial.print(" | Pitch: "); Serial.print(offsetY);
   //Serial.print(" | Yaw: "); Serial.println(offsetZ);
-  Serial.println(F("Giroscopio OK"));
+  #ifdef DEBUG
+    Serial.println(F("Giroscopio OK"));
+  #endif
   // Variable para almacenar el tiempo de la última ejecución
   TickType_t xLastWakeTime = xTaskGetTickCount();
   while(1) {
@@ -46,10 +50,12 @@ void task_giroscopio(void *pvParameters) {
     else
       angleZ = 360 - angleZ;
     // Esperar hasta que hayan pasado 1000 ms desde la última ejecución
-    Serial.print("angle X/Y/Z: "); 
-    Serial.print(angleX); Serial.print("/");
-    Serial.print(angleY); Serial.print("/");
-    Serial.println(angleZ);
+    #ifdef DEBUG
+      Serial.print("angle X/Y/Z: "); 
+      Serial.print(angleX); Serial.print("/");
+      Serial.print(angleY); Serial.print("/");
+      Serial.println(angleZ);
+    #endif
     vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(periodo_task_giroscopio));
   }
 }

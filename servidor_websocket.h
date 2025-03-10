@@ -28,13 +28,21 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
     else if (strcmp(message, "camr") == 0) { angulo_servo_1 -= 1; }
     else if (strcmp(message, "camup") == 0) { angulo_servo_2 -= 1; }
     else if (strcmp(message, "camdn") == 0) { angulo_servo_2 += 1; }
+
+    // Manejar el comando de velocidad: "speed:valor"
+    else if (strncmp(message, "speed:", 6) == 0) {
+      int new_speed;
+      if (sscanf(message + 6, "%d", &new_speed) == 1) {
+        rover_speed = new_speed;
+        }
+      }
+
+    // Manejar el comando de luces: "toggle_light"
+    else if (strcmp(message, "toggle_light") == 0) {
+      //luces_encendidas = !luces_encendidas; // Alternar estado de las luces
+      digitalWrite(pin_led_7colores, !digitalRead(pin_led_7colores)); // Cambia el estado del pin
+      } 
     }
-}
-void init_websockets()
-{
- // webSocket.begin();
- // webSocket.onEvent(webSocketEvent);
- // Serial.println(F("WS Ok"));
 }
 
 void sendSensorData() {
@@ -44,18 +52,22 @@ void sendSensorData() {
              valores_DHT11.temperature, valores_DHT11.humidity, angleZ, angleY, angleX, dUS1);
     // Enviar los datos a todos los clientes conectados
     webSocket.broadcastTXT(jsonBuffer);
-    Serial.print("sendSensorData:"); Serial.println(jsonBuffer);
+    #ifdef DEBUG
+      Serial.print("sendSensorData:"); Serial.println(jsonBuffer);
+    #endif
   }
 }
 
 void task_websockets(void *pvParameters) {
   webSocket.begin();
   webSocket.onEvent(webSocketEvent);
-  Serial.println(F("WS Ok"));
+  #ifdef DEBUG
+    Serial.println(F("WS Ok"));
+  #endif
   TickType_t xLastWakeTime = xTaskGetTickCount();
   while(1) {
     sendSensorData();
     vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(periodo_task_websockets));
-  }
+    }
 }
 

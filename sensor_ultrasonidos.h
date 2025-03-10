@@ -18,7 +18,7 @@ int ping(int TriggerPin, int EchoPin) {
   return distanceCm;
 }
 
-long dUS1;
+unsigned int dUS1;
 
 // Definir la función que se ejecutará en la tarea
 void task_ultrasonidos(void *pvParameters) {
@@ -41,6 +41,7 @@ void task_ultrasonidos(void *pvParameters) {
   }
 }
 
+/**
 void handle_obstaculoUS()
   {
   // mirar la distancia del sensor de ultrasonidos
@@ -50,21 +51,21 @@ void handle_obstaculoUS()
     {
     if (distancia <= 15)
       {
-      Serial.println(F("distancia < 10"));
+      //Serial.println(F("distancia < 10"));
       rover_stop();
       rumbo_adelante = 0;
       digitalWrite(pin_led_7colores, LOW);
       }
     else if (distancia <= 35)
       {
-      Serial.println(F("distancia  30"));
+      //Serial.println(F("distancia  30"));
       set_speed_rover(1000);    
       } 
     else if (distancia > 35 || distancia == -1)
       {
-      Serial.println(F("Sin obstáculos cercanos"));
+      //Serial.println(F("Sin obstáculos cercanos"));
       set_speed_rover(3000); // Velocidad normal        
       }
     }
   }
-
+*/
