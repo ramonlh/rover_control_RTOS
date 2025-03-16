@@ -8,7 +8,7 @@ void init_ftp_server()
 {
   //bool fsok = SPIFFS.begin();
   //Serial.printf_P(PSTR("FS init: %s\n"), fsok ? PSTR("ok") : PSTR("fail!"));
-  ftpSrv.begin(F("admin"), F("18921892"));
+  ftpSrv.begin(F("admin"), F("12341234"));
   #ifdef DEBUG
     Serial.println(F("FTP OK"));
   #endif

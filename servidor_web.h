@@ -14,7 +14,9 @@ String SendHTML(bool refrescar) {
   String ptr = "";
   ptr += head_1;
   ptr += String(other_ip);
+  
   ptr += "192.168.11.92";
+  
   ptr += head_2;
   ptr += script_01;
   return ptr;
