@@ -1,4 +1,5 @@
 
+
 #include <WiFiManager.h> // https://github.com/tzapu/WiFiManager
 
 bool wm_nonblocking = false; // change to true to use non blocking
@@ -62,7 +63,7 @@ void checkButton(){
 
 void init_wifi_manager()
 {
-  WiFi.mode(WIFI_STA); // explicitly set mode, esp defaults to STA+AP  
+  WiFi.mode(WIFI_AP_STA); // explicitly set mode, esp defaults to STA+AP  
   #ifdef DEBUG  
     Serial.println(F("\n Iniciando WiFi"));
   #endif
@@ -79,12 +80,21 @@ void init_wifi_manager()
   wm.setMenu(menu);
 
   wm.setClass("invert");
+
   //set static ip
   wm.setSTAStaticIPConfig(WIFI_IP, WIFI_GW, WIFI_MASK); // set static ip,gw,sn
   wm.setShowStaticFields(true); // force show static ip fields
   wm.setShowDnsFields(true);    // force show dns field always
 
   wm.setConfigPortalTimeout(120); // auto close configportal after n seconds
+  
+    // Configuración del AP
+  const char *ap_ssid = "ROVER_DIEGO"; // SSID personalizado para el AP
+  const char *ap_password = "12341234"; // Contraseña para el AP (opcional)
+  
+  WiFi.softAP(ap_ssid, ap_password); // Crea el punto de acceso con el SSID y la contraseña
+
+  
   bool res;  
   res = wm.autoConnect(); // auto generated AP name from chipid ESPxxxxx
   //res = wm.autoConnect("AutoConnectAP"); // anonymous ap

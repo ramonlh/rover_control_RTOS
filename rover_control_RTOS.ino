@@ -13,7 +13,7 @@
 // includes del proyecto
 #include "defines.h"
 #include <wifi_manager.h>  
-#include "ota.h"
+//#include "ota.h"
 
 #include <sistema_ficheros.h>  
 #include "giroscopio.h"
@@ -41,8 +41,7 @@ void setup() {
   init_wifi_manager();
 
   init_webserver();
-  //init_websockets();
-  init_ota();
+  //init_ota();
   init_ftp_server();
 
   pinMode(pin_led_7colores, OUTPUT);
@@ -74,7 +73,7 @@ void loop() {
   wifimanager_loop();
   webSocket.loop();
   webserver.handleClient();
-  ArduinoOTA.handle();
+  //ArduinoOTA.handle();
   ftpSrv.handleFTP();
   
   // Manejo de sensores y actuadores
