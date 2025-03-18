@@ -61,54 +61,64 @@ void checkButton(){
   }
 }
 
+
 void init_wifi_manager()
 {
-  WiFi.mode(WIFI_AP_STA); // explicitly set mode, esp defaults to STA+AP  
-  #ifdef DEBUG  
-    Serial.println(F("\n Iniciando WiFi"));
-  #endif
-  pinMode(WIFI_TRIGGER_PIN, INPUT);
-  int customFieldLength = 40;
-  // test custom html(radio)
-  const char* custom_radio_str = "<br/><label for='customfieldid'>Custom Field</label><input type='radio' name='customfieldid' value='1' checked> One<br><input type='radio' name='customfieldid' value='2'> Two<br><input type='radio' name='customfieldid' value='3'> Three";
-  new (&custom_field) WiFiManagerParameter(custom_radio_str); // custom html input
-  
-  wm.addParameter(&custom_field);
-  wm.setSaveParamsCallback(saveParamCallback);
-
-  std::vector<const char *> menu = {"wifi","info","param","sep","restart","exit"};
-  wm.setMenu(menu);
-
-  wm.setClass("invert");
-
-  //set static ip
-  wm.setSTAStaticIPConfig(WIFI_IP, WIFI_GW, WIFI_MASK); // set static ip,gw,sn
-  wm.setShowStaticFields(true); // force show static ip fields
-  wm.setShowDnsFields(true);    // force show dns field always
-
-  wm.setConfigPortalTimeout(120); // auto close configportal after n seconds
-  
-    // Configuración del AP
   const char *ap_ssid = "ROVER_DIEGO"; // SSID personalizado para el AP
   const char *ap_password = "12341234"; // Contraseña para el AP (opcional)
-  
-  WiFi.softAP(ap_ssid, ap_password); // Crea el punto de acceso con el SSID y la contraseña
 
-  
-  bool res;  
-  res = wm.autoConnect(); // auto generated AP name from chipid ESPxxxxx
-  //res = wm.autoConnect("AutoConnectAP"); // anonymous ap
-  //res = wm.autoConnect("AutoConnectAP","password"); // password protected ap
-  #ifdef DEBUG 
-    if(!res) {
-      Serial.println(F("No se pudo conectar"));
-      // ESP.restart();
-      } 
-    else {
-      //if you get here you have connected to the WiFi    
-      Serial.println(F("conectado OK"));
+  if (modo_conex == 0)    // conectar a WiFi como STA y activar AP
+    {
+    WiFi.mode(WIFI_AP_STA); // explicitly set mode, esp defaults to STA+AP  
+    #ifdef DEBUG  
+      Serial.print(F("\n Iniciando WiFi: "));
+      Serial.print(ap_ssid);
+      Serial.print("/");     Serial.println(ap_password);
+    #endif
+    pinMode(WIFI_TRIGGER_PIN, INPUT);
+    int customFieldLength = 40;
+    // test custom html(radio)
+    const char* custom_radio_str = "<br/><label for='customfieldid'>Custom Field</label><input type='radio' name='customfieldid' value='1' checked> One<br><input type='radio' name='customfieldid' value='2'> Two<br><input type='radio' name='customfieldid' value='3'> Three";
+    new (&custom_field) WiFiManagerParameter(custom_radio_str); // custom html input
+    
+    wm.addParameter(&custom_field);
+    wm.setSaveParamsCallback(saveParamCallback);
+
+    std::vector<const char *> menu = {"wifi","info","param","sep","restart","exit"};
+    wm.setMenu(menu);
+
+    wm.setClass("invert");
+      // Configuración del AP
+   
+    WiFi.softAP(ap_ssid, ap_password); // Crea el punto de acceso con el SSID y la contraseña
+    bool res;  
+    res = wm.autoConnect(); // auto generated AP name from chipid ESPxxxxx
+    #ifdef DEBUG 
+      if(!res) {
+        Serial.println(F("No se pudo conectar"));
+        // ESP.restart();
+        } 
+      else {
+        //if you get here you have connected to the WiFi    
+        Serial.println(F("conectado OK"));
+      }
+    #endif
     }
-  #endif
+  else if (modo_conex == 1) // solamente AP y RC
+    {
+      // Configuración del AP
+    WiFi.mode(WIFI_AP); // explicitly set mode, esp defaults to AP  
+    WiFi.softAP(ap_ssid, ap_password); // Crea el punto de acceso con el SSID y la contraseña
+    #ifdef DEBUG  
+      Serial.print(F("\n Iniciando WiFi: "));
+      Serial.print(ap_ssid);
+      Serial.print("/");     Serial.println(ap_password);
+    #endif
+    }
+  else if (modo_conex == 2) // solamente RC
+    {
+    WiFi.mode(WIFI_OFF);
+    }
 }  
 
 void wifimanager_loop()

@@ -77,14 +77,3 @@ void task_radiocontrol(void *pvParameters)
     vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(periodo_task_radiocontrol));
   }
 }
-
-// Función para manejar WebSockets
-void recibir_comando_websocket(int comando) {
-  if (comando >= 1 && comando <= 10) {
-    tipo_mov = 50 + comando;
-    control_activo = 1; // Control por WebSockets activo
-  } else if (comando == 0) {
-    tipo_mov = 50;
-    control_activo = 0;
-  }
-}

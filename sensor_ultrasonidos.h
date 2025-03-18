@@ -24,6 +24,9 @@ unsigned int dUS1;
 void task_ultrasonidos(void *pvParameters) {
   pinMode(US1_TriggerPin, OUTPUT);
   pinMode(US1_EchoPin, INPUT);
+  #ifdef DEBUG
+    Serial.println("Ultrasonidos Ok");
+  #endif
   TickType_t xLastWakeTime = xTaskGetTickCount();
   while (1) {
     // Usar el código de ping en la tarea
