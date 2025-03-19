@@ -35,6 +35,7 @@ void send_204()
 void handle_index() {
   send_200();
 }
+
 const char* textplain = "text/plain";
 
 void handle_NotFound() {
@@ -44,7 +45,7 @@ void handle_NotFound() {
 void handle_image(const char* filename) {
   File file = SPIFFS.open(filename, "r");
   if (!file) {
-    Serial.printf(F("Error al abrir el archivo: %s\n"), filename);
+    //Serial.printf(F("Error al abrir el archivo: %s\n"), filename);
     webserver.send(404, textplain, F("Archivo no encontrado"));
     return;
   }
@@ -66,8 +67,5 @@ void init_webserver()
 
   webserver.onNotFound(handle_NotFound); 
   webserver.begin();
-  #ifdef DEBUG
-    Serial.println(F("HTTP OK"));
-  #endif
 }
 

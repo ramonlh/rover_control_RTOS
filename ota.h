@@ -34,8 +34,4 @@ void init_ota()
     });
 
   ArduinoOTA.begin();
-  #ifdef DEBUG
-    Serial.println(F("OTA OK"));
-  #endif
-
 }
