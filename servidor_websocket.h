@@ -14,7 +14,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
     char message[length + 1]; // Crear un buffer temporal
     memcpy(message, payload, length);
     message[length] = '\0'; // Asegurarse de que la cadena termine en '\0'
-
+    Serial.println(message);
     // Intentar parsear el mensaje como JSON
     StaticJsonDocument<200> jsonDoc;
     DeserializationError error = deserializeJson(jsonDoc, message);
@@ -33,9 +33,6 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
       } 
     else 
       {
-      //Serial.println(F("Error parse JSON."));
-      // Comprobar el mensaje recibido y realizar las acciones correspondientes
-      //Serial.println(message);
       if      (strcmp(message, "f") == 0) { tipo_mov = 1; }
       else if (strcmp(message, "r") == 0) { tipo_mov = 2; }
       else if (strcmp(message, "fl") == 0) { tipo_mov = 3; }
@@ -51,19 +48,20 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
       else if (strcmp(message, "camr") == 0) { angulo_servo_1 -= 1; }
       else if (strcmp(message, "camup") == 0) { angulo_servo_2 -= 1; }
       else if (strcmp(message, "camdn") == 0) { angulo_servo_2 += 1; }
-
-      // Manejar el comando de velocidad: "speed:valor"
-      else if (strncmp(message, "speed:", 6) == 0) {
-        int new_speed;
-        if (sscanf(message + 6, "%d", &new_speed) == 1) {
-          rover_speed = new_speed;
-          }
+      
+      else if (strcmp(message, "speedmenos") == 0) {  // reducir la velocidad
+        if (rover_speed > 500) rover_speed -= 500;
+        if (rover_speed < 500) rover_speed = 500;
+        Serial.println(rover_speed);
         }
-
-      // Manejar el comando de luces: "toggle_light"
-      else if (strcmp(message, "toggle_light") == 0) {
-        //luces_encendidas = !luces_encendidas; // Alternar estado de las luces
-        digitalWrite(pin_led_7colores, !digitalRead(pin_led_7colores)); // Cambia el estado del pin
+      else if (strcmp(message, "speedmas") == 0) {  // aumentar la velocidad
+        if (rover_speed < 4000) rover_speed += 500;
+        if (rover_speed > 4000) rover_speed = 4000;
+        Serial.println(rover_speed);
+        }
+      else if (strcmp(message, "luz") == 0) {
+        tipo_mov = 99;
+        digitalWrite(pin_led_7colores, !digitalRead(pin_led_7colores)); // Alternar estado de las luces
         } 
       }
 
@@ -77,18 +75,12 @@ void sendSensorData() {
              valores_DHT11.temperature, valores_DHT11.humidity, angleZ, angleY, angleX, dUS1);
     // Enviar los datos a todos los clientes conectados
     webSocket.broadcastTXT(jsonBuffer);
-    #ifdef DEBUG
-      Serial.print("sendSensorData:"); Serial.println(jsonBuffer);
-    #endif
   }
 }
 
 void task_websockets(void *pvParameters) {
   webSocket.begin();
   webSocket.onEvent(webSocketEvent);
-  #ifdef DEBUG
-    Serial.println(F("WS Ok"));
-  #endif
   TickType_t xLastWakeTime = xTaskGetTickCount();
   while(1) {
     sendSensorData();

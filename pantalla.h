@@ -16,13 +16,4 @@ void init_pantalla()
   tft.println("Hola");
   tft.setTextSize(2);
   tft.println("Pantalla iniciada OK");
-
-  Serial.print("TFT_MISO:");   Serial.println(TFT_MISO);  //   19
-  Serial.print("TFT_MOSI:");   Serial.println(TFT_MOSI);  //   19
-  Serial.print("TFT_SCLK:");   Serial.println(TFT_SCLK);  //    18
-  Serial.print("TFT_CS:");     Serial.println(TFT_CS);  //      15
-  Serial.print("TFT_DC:");     Serial.println(TFT_DC);  //       2
-  Serial.print("TFT_RST:");    Serial.println(TFT_RST);  //      4    // Set TFT_RST to -1 if the display RESET is connected to RST or 3.3V
-  Serial.print("TOUCH_CS:");   Serial.println(TOUCH_CS);  //     5
-
 }

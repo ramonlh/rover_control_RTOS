@@ -80,7 +80,7 @@ const char head_2[] PROGMEM =    // cabeceras
   "<button onmousedown=\"mvD('rotr')\" onmouseup=\"stopD()\">Rot Dcha</button><br>\n"
   // Botones de velocidad en la misma línea -->
   "<div style=\"display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px;\">"
-    "<button onclick=\"chsp(-500)\">---</button>\n"
+    "<button onclick=\"sCom('speedmenos')\">---</button>\n"
     "<div><span id=\"sp_needle\">1000</span></div>"
     "<div id=\"speedometer\" style=\"width: 100px; height: 100px; position: relative;\">"
         "<svg width=\"100\" height=\"100\" viewBox=\"0 0 100 100\">"
@@ -101,9 +101,8 @@ const char head_2[] PROGMEM =    // cabeceras
           "<text id=\"speedText\" x=\"50\" y=\"70\" text-anchor=\"middle\" font-size=\"12\" fill=\"#444\">1000</text>"
         "</svg>"
       "</div>"
-      "<button onclick=\"chsp(+500)\">+++</button>\n"
-      "<button onclick=\"tLUZ()\">LUZ</button>"
-//      "<button id=\"luzButton\" onclick=\"tLUZ()\">LUZ</button>"
+      "<button onclick=\"sCom('speedmas')\">+++</button>\n"
+      "<button onclick=\"sCom('luz')\">LUZ</button>"
   "</div>"   
   "<div style=\"display: flex; justify-content: center; align-items: center; flex-direction: column; margin: 20px;\"></div>"
   "<div id=\"wsStatus\" style=\"font-size: 18px; margin-top: 20px; color: green;\"></div>"
@@ -135,6 +134,7 @@ const char script_01[] PROGMEM =
       "document.getElementById(\"wsStatus\").style.color = \"green\";" // Cambia el color a verde
 
     "ws.onmessage = (event) => {"
+      "console.log(\"Mensaje recibido por WebSocket:\", event.data);"
       "try {let data = JSON.parse(event.data);"
         "upText(\"t\", data.t);"
         "upText(\"h\", data.h);"
@@ -172,37 +172,6 @@ const char script_01[] PROGMEM =
           "else {"
             "console.error(\"WS Off\");}"
           "}"
-
-    // Cambiar la velocidad
-    "function chsp(increment) {"
-      "r_sp+=increment;"
-      "r_sp=Math.max(500, Math.min(4000, r_sp));" // Limitar entre 0 y 4095
-      "document.getElementById('sp_needle').innerText = r_sp;"
-      "document.getElementById('speedText').textContent = r_sp;" // Cambiado a textContent
-
-      // Calcula el ángulo para la aguja (0° para velocidad mínima, 180° para velocidad máxima)
-      "const maxSp=4095;"
-      "const minAng=-90;" // Aguja en 0
-      "const maxAng=90;"  // Aguja en velocidad máxima
-      "const angle=minAng + (r_sp/maxSp)*(maxAng-minAng);"
-      // Actualiza la rotación de la aguja
-      "const needle = document.getElementById('needle');"
-      "needle.style.transform = `rotate(${angle}deg)`;"
-
-      // Enviar velocidad por WebSocket en lugar de fetch
-      "if (ws && ws.readyState === WebSocket.OPEN) {"
-        "ws.send(JSON.stringify({ type:\"speed\", value: r_sp }));}"
-      "else"
-        "{console.error(\"WS Off\");}"
-        "}"
-
-    // Cambiar luz WebSocket en lugar de fetch
-    "function tLUZ() {"
-      "if (ws && ws.readyState === WebSocket.OPEN) {"
-        "ws.send(JSON.stringify({ type: \"toggle_light\" }));}"
-      "else" 
-        "{console.error(\"WS Off\");}"
-      "}"
 
     // Iniciar conexión WebSocket
     "connectWS();"

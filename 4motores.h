@@ -57,6 +57,11 @@ void rover_stop() {
 }
 
 void rover_move(int d1, int d2,  int d3, int d4, int s1, int s2, int s3, int s4) {
+  Serial.print("rover_move:");
+  Serial.print(d1);  Serial.print(s1);  Serial.print("-"); 
+  Serial.print(d2);  Serial.print("-"); Serial.print(s2);  Serial.print("-"); 
+  Serial.print(d3);  Serial.print("-"); Serial.print(s3);  Serial.print("-"); 
+  Serial.print(d4);  Serial.print("-"); Serial.println(s4);
   set_motor(1, d1, s1);
   set_motor(2, d2, s2);
   set_motor(3, d3, s3);
@@ -67,8 +72,20 @@ volatile int control_activo = 0; // 0: Ninguno, 1: WebSockets, 2: Radiocontrol
 
 void task_motores(void *pvParameters) {
   Wire.begin(pin_SDA, pin_SCL);
-  init_MCP23017();
-  init_PCA9685(1600);
+  int auxint = init_MCP23017();
+  if (auxint==0)    {
+    Serial.println("MCP23017 OK"); 
+    }
+  else    {
+    Serial.println("MCP23017 ERROR");
+    }
+  auxint = init_PCA9685(1600);
+  if (init_PCA9685(1600) == 0)    {
+    Serial.println("PCA9685 OK");
+    }
+  else    {
+    Serial.println("PCA9685 ERROR");
+    }
 
   for (int i = 0; i < 4; i++) {
     speed_motor.setValue(i, 1);
@@ -89,8 +106,7 @@ void task_motores(void *pvParameters) {
   while (1) {
     if (tipo_mov != last_mov) {
       last_mov = tipo_mov;
-    }
-    //Serial.println(tipo_mov);
+      }
     // Detener el rover si el tipo_mov es 0 (WebSockets) o 50 (RF cuando no es control activo)
     if ((tipo_mov == 0 || tipo_mov == 50) && control_activo != 2) {
       rover_stop();
