@@ -39,6 +39,7 @@ void task_radiocontrol(void *pvParameters)
   while (1) { // La tarea nunca debe salir
     int boton_RC = lee_RC();
     if (boton_RC >= 1 && boton_RC <= 14) {
+      //Serial.print("BotonRC: "); Serial.println(boton_RC);
       tipo_mov = 50 + boton_RC; // Asignamos valores de 51 a 60
       ultima_senal_RC = millis(); // Guardamos el tiempo de la última señal
       control_activo = 2; // Se activa el control por RF
