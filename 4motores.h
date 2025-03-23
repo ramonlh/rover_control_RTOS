@@ -87,7 +87,7 @@ void task_motores(void *pvParameters) {
   int last_mov = 0;
 
   while (1) {
-    Serial.println(tipo_mov);
+    //Serial.println(tipo_mov);
     if (tipo_mov != last_mov) {
       last_mov = tipo_mov;
       }
