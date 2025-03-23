@@ -63,6 +63,9 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
         tipo_mov = 99;
         digitalWrite(pin_led_7colores, !digitalRead(pin_led_7colores)); // Alternar estado de las luces
         } 
+      else if (strcmp(message, "getssids") == 0) {
+        tipo_mov = 99;
+        } 
       }
 
     }

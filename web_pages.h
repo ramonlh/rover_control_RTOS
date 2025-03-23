@@ -119,7 +119,12 @@ const char head_2[] PROGMEM =    // cabeceras
           "<div class=\"barfill\" style=\"--percent: 0%;\"></div>"
         "</div>"
       "</div>"
-    "</div>";
+    "</div>"
+
+
+    "<a href=\"/setup\">"
+    "<button class=\"button\">Config</button>"
+    "</a>";
 
 const char script_01[] PROGMEM =
   "<script>"
@@ -209,5 +214,63 @@ const char script_01[] PROGMEM =
     "</body>"
   "</html>";
 
+//////////////////////////////////////////////////
+// página setup
+const char setup_page_1[] PROGMEM =    // cabeceras
+  "<!DOCTYPE html>"
+  "<html lang=\"es\">"
+  "<head>"
+    "<meta charset=\"UTF-8\">"
+    "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
+    "<title>Configuración Wi-Fi</title>"
+    "<style>"
+      "body {font-family: Arial, sans-serif;text-align: center;padding: 20px;"
+      "input, button {padding: 10px;margin: 10px;font-size: 16px;border-radius: 5px;border: 1px solid #ccc;}"
+      "button {background-color: #3498db;color: white;cursor: pointer;}"
+      "button:hover {background-color: #2980b9;}.ssid-list {margin-top: 20px;padding: 10px;"
+        "border: 1px solid #ccc;max-height: 150px;overflow-y: auto;}"
+      ".ssid-list div {padding: 5px;margin: 5pxbackground-color: #f1f1f1;border-radius: 4px;}"
+      ".ssid-list div:hover {background-color: #ddd;}"
+    "</style>"
+  "</head>"
+  "<body>"
+    "<h1>Configuración Wi-Fi</h1>"
+    "<div>"
+      "<label for=\"ssid\">SSID:</label>"
+      "<input type=\"text\" id=\"ssid\" placeholder=\"Introduce SSID\" />"
+    "</div>"
+    "<div>"
+      "<label for=\"password\">Contraseña:</label>"
+      "<input type=\"password\" id=\"password\" placeholder=\"Introduce contraseña\" />"
+    "</div>"
+    "<div>"
+      "<button id=\"searchSSIDButton\" onclick=\"searchSSIDs()\">Buscar SSIDs</button>"
+    "</div>"
+    "<div class=\"ssid-list\" id=\"ssidList\">"
+    //<!-- Lista de SSIDs disponibles se mostrará aquí -->
+    "</div>"
+    "<script>"
+    // Función para buscar SSIDs disponibles
+    "function searchSSIDs() {"
+      "let ws = new WebSocket(`ws://${location.hostname}:81/`);"
+      "ws.onopen = () => {"
+      "ws.send('getssids'); " // Enviar comando para obtener SSIDs
+      "};"
 
-
+    "ws.onmessage = (event) => {"
+      "const ssids = JSON.parse(event.data);"  // Suponiendo que el ESP32 responde con una lista de SSIDs
+      "const ssidList = document.getElementById(\"ssidList\");"
+      "ssidList.innerHTML = '';"
+      "ssids.forEach(ssid => {"
+        "const ssidDiv = document.createElement(\"div\");"
+        "ssidDiv.textContent = ssid;"
+        "ssidDiv.onclick = () => {"
+        "document.getElementById(\"ssid\").value = ssid;"
+        "};"
+        "ssidList.appendChild(ssidDiv);"
+        "});"
+      "};"
+    "}"
+    "</script>"
+    "</body>"
+    "</html>";
