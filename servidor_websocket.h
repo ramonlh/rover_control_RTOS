@@ -7,6 +7,18 @@ WebSocketsServer webSocket = WebSocketsServer(PORT_WEBSOCKET); // #define port_w
 #define JSON_BUFFER_SIZE 128
 char jsonBuffer[JSON_BUFFER_SIZE]; // Buffer estático para JSON
 
+void scanWiFiNetworks() {
+    int n = WiFi.scanNetworks();
+    String ssidList = "["; // Formato JSON
+    for (int i = 0; i < n; i++) {
+        if (i > 0) ssidList += ",";
+        ssidList += "\"" + WiFi.SSID(i) + "\"";
+    }
+    ssidList += "]";
+    Serial.println("Enviando SSIDs: " + ssidList);
+    webSocket.broadcastTXT(ssidList);  // Envía la lista a todos los clientes conectados
+}
+
 // Manejar mensajes de WebSocket
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length) {
   if (type == WStype_TEXT) {
@@ -65,6 +77,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
         } 
       else if (strcmp(message, "getssids") == 0) {
         tipo_mov = 99;
+        scanWiFiNetworks();
         } 
       }
 
@@ -73,12 +86,28 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
 
 void sendSensorData() {
   if (webSocket.connectedClients() > 0) { // Solo enviar si hay clientes conectados
-    // Crear el JSON usando un buffer estático
-    snprintf(jsonBuffer, JSON_BUFFER_SIZE, "{\"t\":%.2f, \"h\":%.2f, \"a\":%.2f, \"e\":%.2f, \"g\":%.2f, \"dUS1\":%ld}",
-             valores_DHT11.temperature, valores_DHT11.humidity, angleZ, angleY, angleX, dUS1);
-    // Enviar los datos a todos los clientes conectados
+    snprintf(jsonBuffer, JSON_BUFFER_SIZE, "{\"type\":\"sensor\", \"t\":%.2f, \"h\":%.2f}", valores_DHT11.temperature, valores_DHT11.humidity);
     webSocket.broadcastTXT(jsonBuffer);
   }
+}
+
+void sendGirosData() {
+  if (webSocket.connectedClients() > 0) { // Solo enviar si hay clientes conectados
+    snprintf(jsonBuffer, JSON_BUFFER_SIZE, "{\"type\":\"giros\", \"a\":%.2f, \"e\":%.2f, \"g\":%.2f}",
+             angleZ, angleY, angleX);
+    webSocket.broadcastTXT(jsonBuffer);
+  }
+}
+
+void sendRadarData() {
+  if (enviar_dist == 1)
+    {
+    if (webSocket.connectedClients() > 0) { // Solo enviar si hay clientes conectados
+      snprintf(jsonBuffer, JSON_BUFFER_SIZE, "{\"type\":\"radar\", \"ang\":%ld, \"dis\":%ld}", ang_radar, dist_radar);
+      webSocket.broadcastTXT(jsonBuffer);
+      enviar_dist = 0;
+      }
+    }
 }
 
 void task_websockets(void *pvParameters) {
@@ -86,7 +115,9 @@ void task_websockets(void *pvParameters) {
   webSocket.onEvent(webSocketEvent);
   TickType_t xLastWakeTime = xTaskGetTickCount();
   while(1) {
-    sendSensorData();
+    //sendSensorData();
+    //sendGirosData();
+    sendRadarData();
     vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(periodo_task_websockets));
     }
 }

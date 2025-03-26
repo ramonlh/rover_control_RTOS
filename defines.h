@@ -31,31 +31,34 @@ constexpr uint8_t i2caddress_giroscopio = 0x50;
 
 // parámetros tareas
 const int periodo_task_DHT11 = 10000;
-const int periodo_task_radar = 1000;
+const int periodo_task_radarhumano = 1000;
 const int periodo_task_ultrasonidos = 500;
 const int periodo_task_radiocontrol = 10;
 const int periodo_task_giroscopio = 500;
-const int periodo_task_websockets = 500;
-const int periodo_task_servomotores = 100;
+const int periodo_task_websockets = 10;
+const int periodo_task_servomotores = 10;
 const int periodo_task_motores = 100;
+const int periodo_task_radar = 10;
 
 const int prioridad_task_DHT = 1;           // a mayor número, más prioridad de la tarea
-const int prioridad_task_radar = 1;
+const int prioridad_task_radarhumano = 1;
 const int prioridad_task_ultrasonidos= 2;
 const int prioridad_task_radiocontrol = 2;
 const int prioridad_task_giroscopio = 3;
 const int prioridad_task_websockets = 3;
 const int prioridad_task_servomotores = 3;
 const int prioridad_task_motores = 3;
+const int prioridad_task_radar = 2;
 
 const int tamano_task_DHT = 2048;
-const int tamano_task_radar = 1024;
+const int tamano_task_radarhumano = 1024;
 const int tamano_task_ultrasonidos= 2048;
 const int tamano_task_radiocontrol = 2048;
 const int tamano_task_giroscopio = 2048;
 const int tamano_task_websockets = 3000;
 const int tamano_task_servomotores = 2048;
 const int tamano_task_motores = 3000;
+const int tamano_task_radar = 2048;
 
-int modo_conex = 1;   // 0=STA+AP+RC,  1= AP+RC,  2,  RC solamente
+int modo_conex = 0;   // 0=STA+AP+RC,  1= AP+RC,  2,  RC solamente
 

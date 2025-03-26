@@ -64,7 +64,10 @@ const char head_2[] PROGMEM =    // cabeceras
       "<div><button onmousedown=\"mvD('camr')\" onmouseup=\"stopD()\">&#9654;</button></div>"
     "</div>"
     "<button onmousedown=\"mvD('camdn')\" onmouseup=\"stopD()\">&#9660;</button><br>\n"
-    "<p><span id=\"dUS1\">--</span>cm</p>"
+    //"<p><span id=\"dUS1\">--</span>cm</p>"
+    "<p>angulo: <span id=\"ang\">--</span> º --- distancia: <span id=\"dis\">--</span> mm</p>"
+
+    "<canvas id=\"radarCanvas\" width=\"340\" height=\"180\"></canvas><br>"
     "<button onmousedown=\"mvD('fl')\" onmouseup=\"stopD('stop')\">Giro Izda</button>\n"
     "<button onmousedown=\"mvD('f')\" onmouseup=\"stopD()\">Adelante</button>\n"
     "<button onmousedown=\"mvD('fr')\" onmouseup=\"stopD()\">Giro Dcha</button><br>\n"
@@ -81,29 +84,11 @@ const char head_2[] PROGMEM =    // cabeceras
   // Botones de velocidad en la misma línea -->
   "<div style=\"display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px;\">"
     "<button onclick=\"sCom('speedmenos')\">---</button>\n"
-    "<div><span id=\"sp_needle\">1000</span></div>"
-    "<div id=\"speedometer\" style=\"width: 100px; height: 100px; position: relative;\">"
-        "<svg width=\"100\" height=\"100\" viewBox=\"0 0 100 100\">"
-          //"<!-- Círculo de fondo -->"
-           "<circle cx=\"50\" cy=\"50\" r=\"50\" stroke=\"#ddd\" stroke-width=\"4\" fill=\"none\"></circle>"
-          //"<!-- Escala -->"
-          "<g id=\"scale\">"
-            //"<!-- Crea marcas para la escala -->"
-          "<line x1=\"50\" y1=\"5\" x2=\"50\" y2=\"15\" stroke=\"#333\" stroke-width=\"2\" transform=\"rotate(-90 50 50)\"></line>"
-          "<line x1=\"50\" y1=\"5\" x2=\"50\" y2=\"15\" stroke=\"#333\" stroke-width=\"2\" transform=\"rotate(-60 50 50)\"></line>"
-          "<line x1=\"50\" y1=\"5\" x2=\"50\" y2=\"15\" stroke=\"#333\" stroke-width=\"2\" transform=\"rotate(-30 50 50)\"></line>"
-          "<line x1=\"50\" y1=\"5\" x2=\"50\" y2=\"15\" stroke=\"#333\" stroke-width=\"2\" transform=\"rotate(0 50 50)\"></line>"
-          "<line x1=\"50\" y1=\"5\" x2=\"50\" y2=\"15\" stroke=\"#333\" stroke-width=\"2\" transform=\"rotate(30 50 50)\"></line>"
-          "<line x1=\"50\" y1=\"5\" x2=\"50\" y2=\"15\" stroke=\"#333\" stroke-width=\"2\" transform=\"rotate(60 50 50)\"></line>"
-          "<line x1=\"50\" y1=\"5\" x2=\"50\" y2=\"15\" stroke=\"#333\" stroke-width=\"2\" transform=\"rotate(90 50 50)\"></line>"
-          "</g>"
-          "<line id=\"needle\" x1=\"50\" y1=\"50\" x2=\"50\" y2=\"20\" stroke=\"#e74c3c\" stroke-width=\"3\" transform-origin=\"50 50\" transform=\"rotate(0)\"></line>"
-          "<text id=\"speedText\" x=\"50\" y=\"70\" text-anchor=\"middle\" font-size=\"12\" fill=\"#444\">1000</text>"
-        "</svg>"
-      "</div>"
-      "<button onclick=\"sCom('speedmas')\">+++</button>\n"
-      "<button onclick=\"sCom('luz')\">LUZ</button>"
-  "</div>"   
+    "<span id=\"sp_needle\">1000</span>"
+    "<button onclick=\"sCom('speedmas')\">+++</button><br>"
+   "</div>"   
+   "<button onclick=\"sCom('luz')\">Luz</button>"
+   "<a href=\"/setup\"><button>Config</button></a>"
   "<div style=\"display: flex; justify-content: center; align-items: center; flex-direction: column; margin: 20px;\"></div>"
   "<div id=\"wsStatus\" style=\"font-size: 18px; margin-top: 20px; color: green;\"></div>"
     "<span id=\"t\" style=\"display: none;\">--</span>"
@@ -119,12 +104,7 @@ const char head_2[] PROGMEM =    // cabeceras
           "<div class=\"barfill\" style=\"--percent: 0%;\"></div>"
         "</div>"
       "</div>"
-    "</div>"
-
-
-    "<a href=\"/setup\">"
-    "<button class=\"button\">Config</button>"
-    "</a>";
+    "</div>";
 
 const char script_01[] PROGMEM =
   "<script>"
@@ -133,25 +113,44 @@ const char script_01[] PROGMEM =
 
     // Conectar WebSocket
     "function connectWS() {ws=new WebSocket(`ws://${location.hostname}:81/`);"
-    "ws.onopen = () => {"
+    "ws.onopen=()=>{"
       "console.log(\"WS On\");};"
-      "document.getElementById(\"wsStatus\").innerText = \"ON\";"
-      "document.getElementById(\"wsStatus\").style.color = \"green\";" // Cambia el color a verde
+      "document.getElementById(\"wsStatus\").innerText=\"ON\";"
+      "document.getElementById(\"wsStatus\").style.color=\"green\";" // Cambia el color a verde
 
-    "ws.onmessage = (event) => {"
+    "ws.onmessage=(event)=> "
+      "{"
       "console.log(\"Mensaje recibido por WebSocket:\", event.data);"
-      "try {let data = JSON.parse(event.data);"
-        "upText(\"t\", data.t);"
-        "upText(\"h\", data.h);"
-        "upText(\"a\", data.a);"
-        "upText(\"e\", data.e);"
-        "upText(\"g\", data.g);"
-        "upText(\"dUS1\", data.dUS1);"
+      "try"
+        "{"
+        "let data = JSON.parse(event.data);"
 
-         // Actualizar indicadores gráficos
-        "upInd(data.t,data.h,data.a,data.e,data.g,data.dUS1);}"
-        "catch (e) {console.error(\"Error datos:\", e);}"
+        "if (data.type === \"sensor\")"
+          "{"
+          "upText(\"t\", data.t);"
+          "upText(\"h\", data.h);"
+          "upIndDht(data.t,data.h);"   // Actualizar indicadores gráficos
+          "}"
+          
+        "else if (data.type === \"giros\")"
+          "{"
+          "upText(\"a\", data.a);"
+          "upText(\"e\", data.e);"
+          "upText(\"g\", data.g);"
+          "upIndGiros(data.a,data.e,data.g,data.dUS1);" // Actualizar indicadores gráficos
+          "}"
+        "else if (data.type === \"radar\")"
+          "{"
+          "upText(\"ang\", data.ang);"
+          "upText(\"dis\", data.dis);"
+          "upIndRadar(data.ang,data.dis);" // Actualizar indicadores gráficos
+          "}"
+          
+        "}"
+        "catch(e) {console.error(\"Error datos:\",e);"
+        "}"
       "};"  
+
     "ws.onclose = () => {"
       "console.log(\"WS Off\");"
       "document.getElementById(\"wsStatus\").innerText = \"OFF\";"
@@ -161,8 +160,7 @@ const char script_01[] PROGMEM =
       "console.error(\"Error WS:\", error);};}"
 
       "function upText(id, value) {"
-        "document.getElementById(id).innerText = value.toFixed(1);"
-        "}"
+        "document.getElementById(id).innerText = value.toFixed(1);}"
 
       "let moveInterval;"
 
@@ -186,30 +184,107 @@ const char script_01[] PROGMEM =
 
     "function mvD(command, stopCmd = 'stop') {"
       "sCom(command);"
-      "mvInt = setInterval(() => { sCom(command); }, 50);"
-      "}"
+      "mvInt = setInterval(() => { sCom(command); }, 50);}"
     "function stopD(stopCmd = 'stop') {"
       "clearInterval(mvInt);"
-      "sCom(stopCmd);"
-      "}"
+      "sCom(stopCmd);}"
 
-    "function upInd(t,h,a,e,g) {"
-      "document.getElementById(\"carazim\").style.transform=`rotate(${a}deg)`;"
-      "document.getElementById(\"carelev\").style.transform=`rotate(${e}deg)`;"
-      "document.getElementById(\"cargiro\").style.transform=`rotate(${g}deg)`;"
-
+    "function upIndDht(t,h) {"
       // Actualizar gráficos de temperatura y humedad
       "const tBFill=document.querySelector(\"#tempBar .barfill\");"
       "const hBFill=document.querySelector(\"#humBar .barfill\");"
-
       "tBFill.style.width=`${(t/50)*100}%`;"
       "tBFill.parentElement.setAttribute(\"data-value\",`${t.toFixed(1)}°C`);"
-
       "hBFill.style.width = `${h}%`;"
-      "hBFill.parentElement.setAttribute(\"data-value\",`${h.toFixed(1)}%`);"
+      "hBFill.parentElement.setAttribute(\"data-value\",`${h.toFixed(1)}%`);}"
+
+    "function upIndGiros(a,e,g) {"
+      "document.getElementById(\"carazim\").style.transform=`rotate(${a}deg)`;"
+      "document.getElementById(\"carelev\").style.transform=`rotate(${e}deg)`;"
+      "document.getElementById(\"cargiro\").style.transform=`rotate(${g}deg)`;"
       "document.getElementById(\"a\").innerText=a.toFixed(1);"
       "document.getElementById(\"e\").innerText=e.toFixed(1);"
       "document.getElementById(\"g\").innerText=g.toFixed(1);}"
+      
+    "function upIndRadar(ang,dis) {"
+      "document.getElementById(\"ang\").innerText=ang.toFixed(1);"
+      "document.getElementById(\"dis\").innerText=dis.toFixed(1);"
+      "}"
+
+  "let detections= new Array(181).fill(null);" // Almacena distancias por ángulo (-90 a 90)
+  "let lastAng = -90;" // Último ángulo detectado
+
+  "function upIndRadar(ang, dis) {"
+    // Redondear y mostrar valores de ángulo y distancia
+    "document.getElementById(\"ang\").innerText = ang.toFixed(1);"
+    "document.getElementById(\"dis\").innerText = dis.toFixed(1);"
+
+    // Guardar la distancia en el array de detecciones (ajustando índice de -90 a 90)
+    "let index=ang+90;"
+    "detections[index]=dis;"
+    "lastAng=ang;" // Guardar el ángulo actual para el barrido
+
+    // Obtener el canvas y su contexto
+    "let canvas=document.getElementById(\"radarCanvas\");"
+    "let ctx=canvas.getContext(\"2d\");"
+    "ctx.fillStyle=\"#006400\";" // Color verde oscuro
+    "ctx.fillRect(0,0,canvas.width,canvas.height);"
+    // Definir el centro del radar
+    "let centerX=canvas.width / 2;"
+    "let centerY=canvas.height;"
+
+      // Añadir las circunferencias concéntricas con sus etiquetas de distancia\n" +
+    "let distances=[30,60,90,120,150];" // Distancias para las circunferencias
+    "ctx.lineWidth=1;" // Ajustar el grosor de las líneas
+    "ctx.strokeStyle=\"#32CD32\";" // Color de las circunferencias\n" +
+    "ctx.fillStyle=\"black\";" // Color de las etiquetas de distancia\n" +
+    "distances.forEach(function(dist) {"
+      "ctx.beginPath();"
+      "ctx.arc(centerX,centerY,dist,Math.PI,2*Math.PI);"
+      "ctx.stroke();"
+        "ctx.fillText(dist+\" cm\",centerX+5,centerY-dist);" // Etiqueta de distancia
+        "});"
+
+    // Dibujar los radios para los ángulos\n" +
+    "let angleSteps = [0, 30, 60, 90, 120, 150, 180];" 
+    "ctx.lineWidth = 1;"
+    "ctx.strokeStyle = \"#90EE90\";" 
+    "angleSteps.forEach(function(angle) {" 
+      "let angRad = (angle * Math.PI) / 180;" // Convertir el ángulo a radianes
+      "let sweepX = centerX + Math.cos(angRad) * 150;"
+      "let sweepY = centerY - Math.sin(angRad) * 150;"
+      "ctx.beginPath();"
+      "ctx.moveTo(centerX, centerY);"
+      "ctx.lineTo(sweepX, sweepY);"
+      "ctx.stroke();"
+      "});"
+
+    // Dibujar todos los puntos detectados en el radar
+    "for (let i = 0; i < detections.length; i++) {"
+      "if (detections[i] !== null) {"
+        "let angRad = ((i - 90) * Math.PI) / 180;" // Convertir índice a ángulo real
+        "let maxDist = 300;" // Distancia máxima representada en píxeles
+        "let x = centerX + Math.cos(angRad) * (detections[i] / 2750) * maxDist;"  // 2750 es experimental
+        "let y = centerY - Math.sin(angRad) * (detections[i] / 2750) * maxDist;"
+        "ctx.beginPath();"
+        "ctx.arc(x, y, 2, 0, 2 * Math.PI);"
+        "ctx.fillStyle = \"#90EE90\";"
+        "ctx.fill();"
+      "}"
+    "}"
+
+    // Dibujar el barrido de radar (línea verde en el ángulo actual)
+    "let angRad = (lastAng * Math.PI) / 180;"
+    "let sweepX = centerX + Math.cos(angRad) * 150;"
+    "let sweepY = centerY - Math.sin(angRad) * 150;"
+
+    "ctx.beginPath();"
+    "ctx.moveTo(centerX, centerY);"
+    "ctx.lineTo(sweepX, sweepY);"
+    "ctx.strokeStyle = \"limegreen\";"
+    "ctx.lineWidth = 2;"
+    "ctx.stroke();"
+  "}"
     "</script>"
     "</body>"
   "</html>";
@@ -222,55 +297,85 @@ const char setup_page_1[] PROGMEM =    // cabeceras
   "<head>"
     "<meta charset=\"UTF-8\">"
     "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
-    "<title>Configuración Wi-Fi</title>"
+    "<title>Configuración</title>"
     "<style>"
-      "body {font-family: Arial, sans-serif;text-align: center;padding: 20px;"
-      "input, button {padding: 10px;margin: 10px;font-size: 16px;border-radius: 5px;border: 1px solid #ccc;}"
-      "button {background-color: #3498db;color: white;cursor: pointer;}"
-      "button:hover {background-color: #2980b9;}.ssid-list {margin-top: 20px;padding: 10px;"
-        "border: 1px solid #ccc;max-height: 150px;overflow-y: auto;}"
-      ".ssid-list div {padding: 5px;margin: 5pxbackground-color: #f1f1f1;border-radius: 4px;}"
-      ".ssid-list div:hover {background-color: #ddd;}"
+      "body "
+        "{font-family: Arial, sans-serif;text-align: center;padding: 20px;}"
+        "input, button {padding: 10px;margin: 10px;font-size: 16px;border-radius: 5px;"
+            "border: 1px solid #ccc;}"
+        "button {background-color: #3498db;color: white;cursor: pointer;}"
+        "button:hover {background-color: #2980b9;}"
+        ".ssid-list {margin-top: 20px;padding: 10px;"
+            "border: 1px solid #ccc;max-height: 150px;overflow-y: auto;}"
+        ".ssid-list div {padding: 5px;margin: 5px; background-color: #f1f1f1;border-radius: 4px;}"
+        ".ssid-list div:hover {background-color: #ddd;}"
     "</style>"
   "</head>"
+
   "<body>"
-    "<h1>Configuración Wi-Fi</h1>"
-    "<div>"
-      "<label for=\"ssid\">SSID:</label>"
-      "<input type=\"text\" id=\"ssid\" placeholder=\"Introduce SSID\" />"
-    "</div>"
-    "<div>"
-      "<label for=\"password\">Contraseña:</label>"
-      "<input type=\"password\" id=\"password\" placeholder=\"Introduce contraseña\" />"
-    "</div>"
-    "<div>"
-      "<button id=\"searchSSIDButton\" onclick=\"searchSSIDs()\">Buscar SSIDs</button>"
-    "</div>"
+    "<h2>Configuración</h2>";
+
+const char setup_page_2[] PROGMEM =    // cabeceras
+    "<div><label for=\"modoinic\">Modo inicio:</label>"
+    "<input type=text id=\"modoinic\" placeholder=\"0,1,2\"></div>"
+    "<div><label for=\"ssid\">SSID:</label><input type=text id=\"ssid\" placeholder=\"SSID\"></div>"
+    "<div><label for=\"password\">Contraseña:</label><input type=password id=password placeholder=\"Contraseña\"></div>"
+    "<div><button id=\"searchSSIDButton\" onclick=\"searchSSIDs()\">Buscar SSIDs</button>"
+    "<button id=\"saveButton\" onclick=\"saveData()\">Guardar</button></div>"
     "<div class=\"ssid-list\" id=\"ssidList\">"
-    //<!-- Lista de SSIDs disponibles se mostrará aquí -->
+      //<!-- Lista de SSIDs disponibles se mostrará aquí -->
     "</div>"
-    "<script>"
+
+  "<script>"
     // Función para buscar SSIDs disponibles
     "function searchSSIDs() {"
       "let ws = new WebSocket(`ws://${location.hostname}:81/`);"
-      "ws.onopen = () => {"
-      "ws.send('getssids'); " // Enviar comando para obtener SSIDs
-      "};"
+      "ws.onopen = () => {ws.send('getssids');};"
 
     "ws.onmessage = (event) => {"
       "const ssids = JSON.parse(event.data);"  // Suponiendo que el ESP32 responde con una lista de SSIDs
+        //"console.log(\"Tipo de ssids:\", typeof ssids);" // Verifica el tipo de dato (debe ser 'object' o 'array').
+        //"console.log(\"Lista de SSIDs:\", ssids);" // Imprime los datos parseados.
+         //Verifica si ssids es realmente un array.
+      "if (!Array.isArray(ssids)) {throw new Error(\"El dato recibido no es un array válido.\");}"
       "const ssidList = document.getElementById(\"ssidList\");"
       "ssidList.innerHTML = '';"
       "ssids.forEach(ssid => {"
         "const ssidDiv = document.createElement(\"div\");"
-        "ssidDiv.textContent = ssid;"
-        "ssidDiv.onclick = () => {"
-        "document.getElementById(\"ssid\").value = ssid;"
-        "};"
-        "ssidList.appendChild(ssidDiv);"
-        "});"
-      "};"
+        "ssidDiv.textContent = ssid;ssidDiv.onclick = () => {"
+        "document.getElementById(\"ssid\").value = ssid;};"
+        "ssidList.appendChild(ssidDiv);});"
+      "};}"
+
+    "function saveData() {"
+        "console.log(\"Guardando datos\");" 
+        "const modoinic = document.getElementById('modoinic').value;"
+        "const ssid = document.getElementById('ssid').value;"
+        "const password = document.getElementById('password').value;"
+
+        "const data = {modoinic: modoinic,ssid: ssid,password: password};"
+
+        "fetch('http://' + location.hostname + '/save_config', {"
+            "method: 'POST',headers: {'Content-Type': 'application/json'},"
+            "body: JSON.stringify(data)})"
+        ".then(response => response.json())"
+        ".then(data => {alert('Configuración guardada');})"
+        ".catch((error) => {console.error('Error:', error);});"
     "}"
+
+    "function loadConfig() {"
+      "fetch('http://' + location.hostname + '/get_config')"
+        ".then(response => response.json())"
+        ".then(data => {"
+          "document.getElementById('modoinic').value = data.modoinic || \"\";"
+          "document.getElementById('ssid').value = data.ssid || \"\";"
+          "document.getElementById('password').value = data.password || \"\";"
+          "})"
+        ".catch(error => console.error('Error al cargar la configuración:', error));"
+        "}"
+
+    "window.onload = loadConfig;"
+
     "</script>"
     "</body>"
-    "</html>";
+  "</html>";

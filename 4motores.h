@@ -64,6 +64,7 @@ void rover_move(int d1, int d2,  int d3, int d4, int s1, int s2, int s3, int s4)
 }
 
 volatile int control_activo = 0; // 0: Ninguno, 1: WebSockets, 2: Radiocontrol
+int enabled_motores = 1;
 
 void task_motores(void *pvParameters) {
   Wire.begin(pin_SDA, pin_SCL);
@@ -87,44 +88,47 @@ void task_motores(void *pvParameters) {
   int last_mov = 0;
 
   while (1) {
-    //Serial.println(tipo_mov);
-    if (tipo_mov != last_mov) {
-      last_mov = tipo_mov;
-      }
-    // Detener el rover si el tipo_mov es 0 (WebSockets) o 50 (RF cuando no es control activo)
-    if ((tipo_mov == 0 || tipo_mov == 50) && control_activo != 2) {
-      tipo_mov=99;
-      rover_stop();
-      } 
-    else if ((tipo_mov == 1) || (tipo_mov == 51)) {
-      rover_move(MFORWARD, MFORWARD, MFORWARD, MFORWARD, rover_speed, rover_speed, rover_speed, rover_speed);  // adelante
-      } 
-    else if ((tipo_mov == 2) || (tipo_mov == 52)) {
-      rover_move(MBACK, MBACK, MBACK, MBACK, rover_speed, rover_speed, rover_speed, rover_speed);  // atras
-      } 
-    else if ((tipo_mov == 3) || (tipo_mov == 53)) {
-      rover_move(MFORWARD, MFORWARD, MFORWARD, MFORWARD, rover_speed, rover_speed/2, rover_speed, rover_speed/2);  // adelante derecha
-      } 
-    else if ((tipo_mov == 4) || (tipo_mov == 54)) {
-      rover_move(MFORWARD, MFORWARD, MFORWARD, MFORWARD, rover_speed/2, rover_speed, rover_speed/2, rover_speed);  // adelante izquierda
+    if (enabled_motores > 0)
+      {
+      //Serial.println(tipo_mov);
+      if (tipo_mov != last_mov) {
+        last_mov = tipo_mov;
+        }
+      // Detener el rover si el tipo_mov es 0 (WebSockets) o 50 (RF cuando no es control activo)
+      if ((tipo_mov == 0 || tipo_mov == 50) && control_activo != 2) {
+        tipo_mov=99;
+        rover_stop();
         } 
-    else if ((tipo_mov == 5) || (tipo_mov == 55)) {
-      rover_move(MBACK, MBACK, MBACK, MBACK, rover_speed/2, rover_speed, rover_speed/2, rover_speed);  // atras izquierda
-      } 
-    else if ((tipo_mov == 6) || (tipo_mov == 56)) {
-      rover_move(MBACK, MBACK, MBACK, MBACK,rover_speed, rover_speed/2, rover_speed, rover_speed/2);  // atras derecha
-      } 
-    else if ((tipo_mov == 7) || (tipo_mov == 57)) {
-      rover_move(MFORWARD, MBACK, MFORWARD, MBACK,rover_speed, rover_speed, rover_speed, rover_speed);   // rot derecha
-      } 
-    else if ((tipo_mov == 8) || (tipo_mov == 58)) {
-      rover_move(MBACK, MFORWARD, MBACK, MFORWARD,rover_speed, rover_speed, rover_speed, rover_speed);   // rot izquierda
-      } 
-    else if ((tipo_mov == 9) || (tipo_mov == 59)) {
-      rover_move(MBACK, MFORWARD, MFORWARD, MBACK, rover_speed, rover_speed, rover_speed, rover_speed);  // lat izquierda
-      } 
-    else if ((tipo_mov == 10) || (tipo_mov == 60)) {
-      rover_move(MFORWARD, MBACK, MBACK, MFORWARD, rover_speed, rover_speed, rover_speed, rover_speed);  // lat derecha
+      else if ((tipo_mov == 1) || (tipo_mov == 51)) {
+        rover_move(MFORWARD, MFORWARD, MFORWARD, MFORWARD, rover_speed, rover_speed, rover_speed, rover_speed);  // adelante
+        } 
+      else if ((tipo_mov == 2) || (tipo_mov == 52)) {
+        rover_move(MBACK, MBACK, MBACK, MBACK, rover_speed, rover_speed, rover_speed, rover_speed);  // atras
+        } 
+      else if ((tipo_mov == 3) || (tipo_mov == 53)) {
+        rover_move(MFORWARD, MFORWARD, MFORWARD, MFORWARD, rover_speed, rover_speed/2, rover_speed, rover_speed/2);  // adelante derecha
+        } 
+      else if ((tipo_mov == 4) || (tipo_mov == 54)) {
+        rover_move(MFORWARD, MFORWARD, MFORWARD, MFORWARD, rover_speed/2, rover_speed, rover_speed/2, rover_speed);  // adelante izquierda
+          } 
+      else if ((tipo_mov == 5) || (tipo_mov == 55)) {
+        rover_move(MBACK, MBACK, MBACK, MBACK, rover_speed/2, rover_speed, rover_speed/2, rover_speed);  // atras izquierda
+        } 
+      else if ((tipo_mov == 6) || (tipo_mov == 56)) {
+        rover_move(MBACK, MBACK, MBACK, MBACK,rover_speed, rover_speed/2, rover_speed, rover_speed/2);  // atras derecha
+        } 
+      else if ((tipo_mov == 7) || (tipo_mov == 57)) {
+        rover_move(MFORWARD, MBACK, MFORWARD, MBACK,rover_speed, rover_speed, rover_speed, rover_speed);   // rot derecha
+        } 
+      else if ((tipo_mov == 8) || (tipo_mov == 58)) {
+        rover_move(MBACK, MFORWARD, MBACK, MFORWARD,rover_speed, rover_speed, rover_speed, rover_speed);   // rot izquierda
+        } 
+      else if ((tipo_mov == 9) || (tipo_mov == 59)) {
+        rover_move(MBACK, MFORWARD, MFORWARD, MBACK, rover_speed, rover_speed, rover_speed, rover_speed);  // lat izquierda
+        } 
+      else if ((tipo_mov == 10) || (tipo_mov == 60)) {
+        rover_move(MFORWARD, MBACK, MBACK, MFORWARD, rover_speed, rover_speed, rover_speed, rover_speed);  // lat derecha
+        }
       }
 
     vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(periodo_task_motores));
