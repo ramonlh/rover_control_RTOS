@@ -115,9 +115,9 @@ void task_websockets(void *pvParameters) {
   webSocket.onEvent(webSocketEvent);
   TickType_t xLastWakeTime = xTaskGetTickCount();
   while(1) {
-    //sendSensorData();
-    //sendGirosData();
-    sendRadarData();
+    sendSensorData();
+    sendGirosData();
+    if (enabled_radar == 1) { sendRadarData(); }
     vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(periodo_task_websockets));
     }
 }

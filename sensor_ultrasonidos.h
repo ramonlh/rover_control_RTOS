@@ -42,29 +42,3 @@ void task_ultrasonidos(void *pvParameters) {
     vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(periodo_task_ultrasonidos));
   }
 }
-
-
-void handle_obstaculoUS()
-  {
-  // mirar la distancia del sensor de ultrasonidos
-  int distancia = dUS1;
-  //delay(5);
-  //if (rumbo_adelante == 1)
-    {
-    if (distancia <= 15)
-      {
-      rover_stop();
-      //rumbo_adelante = 0;
-      digitalWrite(pin_led_7colores, LOW);
-      }
-    else if (distancia <= 35)
-      {
-      set_speed_rover(1000);    
-      } 
-    else if (distancia > 35 || distancia == -1)
-      {
-      set_speed_rover(3000); // Velocidad normal        
-      }
-    }
-  }
-

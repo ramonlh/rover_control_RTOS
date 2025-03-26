@@ -10,7 +10,6 @@ const char head_1[] PROGMEM =    // cabeceras
       "<style>"
         "body {font-family:Arial, sans-serif; text-align: center; }"
         "button {padding:10px 20px; font-size: 16px; margin: 10px; }"
-        //"html {font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}"
         "body{margin-top:50px;} h1 {color: #444444;margin: 50px auto 30px;} h3 {color: #444444;margin-bottom: 50px;}\n"
         ".button {display:inline-block;width: 80px;background-color: #3498db;border: none;color: white;padding: 13px 30px;"
         "text-decoration: none;font-size: 25px;margin: 0px auto 35px;cursor: pointer;border-radius: 4px;}\n"
@@ -19,7 +18,6 @@ const char head_1[] PROGMEM =    // cabeceras
         ".button-off {background-color: #34495e;}"
         ".button-off:active {background-color: #2c3e50;}"
         "p {font-size: 14px;color: #888;margin-bottom: 10px;}"
-        ".indcar {display:flex; justify-content: space-around; margin:10px 0;}"
         ".indtemp {display:flex; justify-content: space-around; margin:10px 0;}"
         ".indicator {text-align: center;}"
         ".car {width: 60px;  height: 60px; transition: transform 0.3s ease; transform-origin: center center;}"
@@ -38,20 +36,6 @@ const char head_1[] PROGMEM =    // cabeceras
       "</style>"
     "</head>"
     "<body>"
-    "<div class=\"indcar\">"
-      "<div class=\"indicator\">"
-        "<img src=\"/carup\" alt=\"Car\" id=\"carazim\" class=\"car\">"
-        "<p>Rumbo: <span id=\"a\">--</span>°</p>"
-      "</div>"
-      "<div class=\"indicator\">"
-        "<img src=\"/carside\" alt=\"Car\" id=\"carelev\" class=\"car\">"
-        "<p>Cab: <span id=\"e\">--</span>°</p>"
-      "</div>"
-      "<div class=\"indicator\">"
-        "<img src=\"/carback\" alt=\"Car\" id=\"cargiro\" class=\"car\">"
-        "<p>Ala: <span id=\"g\">--</span>°</p>"
-      "</div>"
-    "</div>"
     "<button onmousedown=\"mvD('camup')\" onmouseup=\"stopD()\">&#9650;</button><br>"
     "<div style=\"display: flex; align-items: center; justify-content: center; gap: 5px;\">"
       "<div><button onmousedown=\"mvD('caml')\" onmouseup=\"stopD()\">&#9664;</button>\n</div>"
@@ -73,7 +57,18 @@ const char head_2[] PROGMEM =    // cabeceras
     "<button onmousedown=\"mvD('fr')\" onmouseup=\"stopD()\">Giro Dcha</button><br>\n"
     "<div style=\"display: flex; align-items: center; justify-content: center; gap: 5px;\">"
       "<div><button id=controlButton8 onmousedown=\"mvD('latl')\" onmouseup=\"stopD()\">Lat Izda</button></div>\n"
-      "<div><img src=\"/carup\" alt=\"Car\" id=\"caridle\" class=\"car\"></div>"
+      "<div class=\"indicator\">"
+        "<img src=\"/carside\" alt=\"Car\" id=\"carelev\" class=\"car\">"
+        "<p>Cab: <span id=\"e\">--</span>°</p>"
+      "</div>"
+      "<div class=\"indicator\">"
+        "<img src=\"/carup\" alt=\"Car\" id=\"carazim\" class=\"car\">"
+        "<p><span id=\"a\">--</span>°</p>"
+      "</div>"
+      "<div class=\"indicator\">"
+        "<img src=\"/carback\" alt=\"Car\" id=\"cargiro\" class=\"car\">"
+        "<p>Ala: <span id=\"g\">--</span>°</p>"
+      "</div>"
       "<div><button onmousedown=\"mvD('latr')\" onmouseup=\"stopD()\">Lat Dcha</button>\n</div>"
     "</div>"
   "<button onmousedown=\"mvD('rl')\" onmouseup=\"stopD()\">Atras Izda</button>\n"
@@ -120,32 +115,31 @@ const char script_01[] PROGMEM =
 
     "ws.onmessage=(event)=> "
       "{"
-      "console.log(\"Mensaje recibido por WebSocket:\", event.data);"
+      //"console.log(\"Mensaje rec. WebSocket:\", event.data);"
       "try"
         "{"
-        "let data = JSON.parse(event.data);"
+        "let data=JSON.parse(event.data);"
 
-        "if (data.type === \"sensor\")"
+        "if (data.type===\"sensor\")"
           "{"
-          "upText(\"t\", data.t);"
-          "upText(\"h\", data.h);"
+          "upText(\"t\",data.t);"
+          "upText(\"h\",data.h);"
           "upIndDht(data.t,data.h);"   // Actualizar indicadores gráficos
           "}"
           
-        "else if (data.type === \"giros\")"
+        "else if (data.type===\"giros\")"
           "{"
-          "upText(\"a\", data.a);"
-          "upText(\"e\", data.e);"
-          "upText(\"g\", data.g);"
+          "upText(\"a\",data.a);"
+          "upText(\"e\",data.e);"
+          "upText(\"g\",data.g);"
           "upIndGiros(data.a,data.e,data.g,data.dUS1);" // Actualizar indicadores gráficos
           "}"
-        "else if (data.type === \"radar\")"
+        "else if (data.type===\"radar\")"
           "{"
-          "upText(\"ang\", data.ang);"
-          "upText(\"dis\", data.dis);"
+          "upText(\"ang\",data.ang);"
+          "upText(\"dis\",data.dis);"
           "upIndRadar(data.ang,data.dis);" // Actualizar indicadores gráficos
           "}"
-          
         "}"
         "catch(e) {console.error(\"Error datos:\",e);"
         "}"
@@ -182,10 +176,10 @@ const char script_01[] PROGMEM =
     // mover cámara
     "let mvInt;\n"
 
-    "function mvD(command, stopCmd = 'stop') {"
+    "function mvD(command,stopCmd='stop') {"
       "sCom(command);"
-      "mvInt = setInterval(() => { sCom(command); }, 50);}"
-    "function stopD(stopCmd = 'stop') {"
+      "mvInt=setInterval(()=>{ sCom(command);},50);}"
+    "function stopD(stopCmd='stop') {"
       "clearInterval(mvInt);"
       "sCom(stopCmd);}"
 
@@ -195,7 +189,7 @@ const char script_01[] PROGMEM =
       "const hBFill=document.querySelector(\"#humBar .barfill\");"
       "tBFill.style.width=`${(t/50)*100}%`;"
       "tBFill.parentElement.setAttribute(\"data-value\",`${t.toFixed(1)}°C`);"
-      "hBFill.style.width = `${h}%`;"
+      "hBFill.style.width=`${h}%`;"
       "hBFill.parentElement.setAttribute(\"data-value\",`${h.toFixed(1)}%`);}"
 
     "function upIndGiros(a,e,g) {"
@@ -208,16 +202,15 @@ const char script_01[] PROGMEM =
       
     "function upIndRadar(ang,dis) {"
       "document.getElementById(\"ang\").innerText=ang.toFixed(1);"
-      "document.getElementById(\"dis\").innerText=dis.toFixed(1);"
-      "}"
+      "document.getElementById(\"dis\").innerText=dis.toFixed(1);}"
 
   "let detections= new Array(181).fill(null);" // Almacena distancias por ángulo (-90 a 90)
-  "let lastAng = -90;" // Último ángulo detectado
+  "let lastAng=-90;" // Último ángulo detectado
 
-  "function upIndRadar(ang, dis) {"
+  "function upIndRadar(ang,dis) {"
     // Redondear y mostrar valores de ángulo y distancia
-    "document.getElementById(\"ang\").innerText = ang.toFixed(1);"
-    "document.getElementById(\"dis\").innerText = dis.toFixed(1);"
+    "document.getElementById(\"ang\").innerText=ang.toFixed(1);"
+    "document.getElementById(\"dis\").innerText=dis.toFixed(1);"
 
     // Guardar la distancia en el array de detecciones (ajustando índice de -90 a 90)
     "let index=ang+90;"
@@ -246,37 +239,37 @@ const char script_01[] PROGMEM =
         "});"
 
     // Dibujar los radios para los ángulos\n" +
-    "let angleSteps = [0, 30, 60, 90, 120, 150, 180];" 
-    "ctx.lineWidth = 1;"
-    "ctx.strokeStyle = \"#90EE90\";" 
+    "let angleSteps=[0,30,60,90,120,150,180];" 
+    "ctx.lineWidth=1;"
+    "ctx.strokeStyle=\"#90EE90\";" 
     "angleSteps.forEach(function(angle) {" 
-      "let angRad = (angle * Math.PI) / 180;" // Convertir el ángulo a radianes
-      "let sweepX = centerX + Math.cos(angRad) * 150;"
-      "let sweepY = centerY - Math.sin(angRad) * 150;"
+      "let angRad=(angle*Math.PI)/180;" // Convertir el ángulo a radianes
+      "let sweepX=centerX+Math.cos(angRad)*150;"
+      "let sweepY=centerY-Math.sin(angRad)*150;"
       "ctx.beginPath();"
-      "ctx.moveTo(centerX, centerY);"
-      "ctx.lineTo(sweepX, sweepY);"
+      "ctx.moveTo(centerX,centerY);"
+      "ctx.lineTo(sweepX,sweepY);"
       "ctx.stroke();"
       "});"
 
     // Dibujar todos los puntos detectados en el radar
-    "for (let i = 0; i < detections.length; i++) {"
-      "if (detections[i] !== null) {"
-        "let angRad = ((i - 90) * Math.PI) / 180;" // Convertir índice a ángulo real
-        "let maxDist = 300;" // Distancia máxima representada en píxeles
-        "let x = centerX + Math.cos(angRad) * (detections[i] / 2750) * maxDist;"  // 2750 es experimental
-        "let y = centerY - Math.sin(angRad) * (detections[i] / 2750) * maxDist;"
+    "for (let i=0;i<detections.length;i++) {"
+      "if (detections[i]!==null) {"
+        "let angRad=((i-90)*Math.PI)/180;" // Convertir índice a ángulo real
+        "let maxDist=300;" // Distancia máxima representada en píxeles
+        "let x=centerX+Math.cos(angRad)*(detections[i]/2750)*maxDist;"  // 2750 es experimental
+        "let y=centerY-Math.sin(angRad)*(detections[i]/2750)*maxDist;"
         "ctx.beginPath();"
-        "ctx.arc(x, y, 2, 0, 2 * Math.PI);"
-        "ctx.fillStyle = \"#90EE90\";"
+        "ctx.arc(x,y,2,0,2*Math.PI);"
+        "ctx.fillStyle=\"#90EE90\";"
         "ctx.fill();"
       "}"
     "}"
 
     // Dibujar el barrido de radar (línea verde en el ángulo actual)
-    "let angRad = (lastAng * Math.PI) / 180;"
-    "let sweepX = centerX + Math.cos(angRad) * 150;"
-    "let sweepY = centerY - Math.sin(angRad) * 150;"
+    "let angRad=(lastAng*Math.PI)/180;"
+    "let sweepX=centerX+Math.cos(angRad)*150;"
+    "let sweepY=centerY-Math.sin(angRad)*150;"
 
     "ctx.beginPath();"
     "ctx.moveTo(centerX, centerY);"
@@ -302,13 +295,13 @@ const char setup_page_1[] PROGMEM =    // cabeceras
       "body "
         "{font-family: Arial, sans-serif;text-align: center;padding: 20px;}"
         "input, button {padding: 10px;margin: 10px;font-size: 16px;border-radius: 5px;"
-            "border: 1px solid #ccc;}"
-        "button {background-color: #3498db;color: white;cursor: pointer;}"
-        "button:hover {background-color: #2980b9;}"
-        ".ssid-list {margin-top: 20px;padding: 10px;"
-            "border: 1px solid #ccc;max-height: 150px;overflow-y: auto;}"
-        ".ssid-list div {padding: 5px;margin: 5px; background-color: #f1f1f1;border-radius: 4px;}"
-        ".ssid-list div:hover {background-color: #ddd;}"
+            "border:1px solid #ccc;}"
+        "button {background-color:#3498db;color:white;cursor:pointer;}"
+        "button:hover {background-color:#2980b9;}"
+        ".ssid-list {margin-top:20px;padding:10px;"
+            "border: 1px solid #ccc;max-height: 150px;overflow-y:auto;}"
+        ".ssid-list div {padding:5px;margin:5px;background-color:#f1f1f1;border-radius: 4px;}"
+        ".ssid-list div:hover {background-color:#ddd;}"
     "</style>"
   "</head>"
 
@@ -329,50 +322,49 @@ const char setup_page_2[] PROGMEM =    // cabeceras
   "<script>"
     // Función para buscar SSIDs disponibles
     "function searchSSIDs() {"
-      "let ws = new WebSocket(`ws://${location.hostname}:81/`);"
-      "ws.onopen = () => {ws.send('getssids');};"
+      "let ws=new WebSocket(`ws://${location.hostname}:81/`);"
+      "ws.onopen=()=>{ws.send('getssids');};"
 
-    "ws.onmessage = (event) => {"
-      "const ssids = JSON.parse(event.data);"  // Suponiendo que el ESP32 responde con una lista de SSIDs
+    "ws.onmessage=(event) => {"
+      "const ssids=JSON.parse(event.data);"  // Suponiendo que el ESP32 responde con una lista de SSIDs
         //"console.log(\"Tipo de ssids:\", typeof ssids);" // Verifica el tipo de dato (debe ser 'object' o 'array').
         //"console.log(\"Lista de SSIDs:\", ssids);" // Imprime los datos parseados.
          //Verifica si ssids es realmente un array.
       "if (!Array.isArray(ssids)) {throw new Error(\"El dato recibido no es un array válido.\");}"
       "const ssidList = document.getElementById(\"ssidList\");"
-      "ssidList.innerHTML = '';"
-      "ssids.forEach(ssid => {"
-        "const ssidDiv = document.createElement(\"div\");"
-        "ssidDiv.textContent = ssid;ssidDiv.onclick = () => {"
-        "document.getElementById(\"ssid\").value = ssid;};"
+      "ssidList.innerHTML='';"
+      "ssids.forEach(ssid=>{"
+        "const ssidDiv=document.createElement(\"div\");"
+        "ssidDiv.textContent=ssid;ssidDiv.onclick=()=>{"
+        "document.getElementById(\"ssid\").value=ssid;};"
         "ssidList.appendChild(ssidDiv);});"
       "};}"
 
     "function saveData() {"
-        "console.log(\"Guardando datos\");" 
-        "const modoinic = document.getElementById('modoinic').value;"
-        "const ssid = document.getElementById('ssid').value;"
-        "const password = document.getElementById('password').value;"
+        //"console.log(\"Guardando datos\");" 
+        "const modoinic=document.getElementById('modoinic').value;"
+        "const ssid=document.getElementById('ssid').value;"
+        "const password=document.getElementById('password').value;"
 
-        "const data = {modoinic: modoinic,ssid: ssid,password: password};"
+        "const data={modoinic: modoinic,ssid: ssid,password: password};"
 
-        "fetch('http://' + location.hostname + '/save_config', {"
-            "method: 'POST',headers: {'Content-Type': 'application/json'},"
-            "body: JSON.stringify(data)})"
-        ".then(response => response.json())"
-        ".then(data => {alert('Configuración guardada');})"
-        ".catch((error) => {console.error('Error:', error);});"
+        "fetch('http://'+location.hostname+'/save_config',{"
+            "method:'POST',headers:{'Content-Type':'application/json'},"
+            "body:JSON.stringify(data)})"
+        ".then(response=>response.json())"
+        ".then(data=>{alert('Configuración guardada');})"
+        ".catch((error)=>{console.error('Error:',error);});"
     "}"
 
     "function loadConfig() {"
-      "fetch('http://' + location.hostname + '/get_config')"
-        ".then(response => response.json())"
-        ".then(data => {"
-          "document.getElementById('modoinic').value = data.modoinic || \"\";"
-          "document.getElementById('ssid').value = data.ssid || \"\";"
-          "document.getElementById('password').value = data.password || \"\";"
+      "fetch('http://'+location.hostname+'/get_config')"
+        ".then(response=>response.json())"
+        ".then(data=>{"
+          "document.getElementById('modoinic').value=data.modoinic || \"\";"
+          "document.getElementById('ssid').value=data.ssid || \"\";"
+          "document.getElementById('password').value=data.password || \"\";"
           "})"
-        ".catch(error => console.error('Error al cargar la configuración:', error));"
-        "}"
+        ".catch(error=>console.error('Error al cargar la configuración:',error));}"
 
     "window.onload = loadConfig;"
 
