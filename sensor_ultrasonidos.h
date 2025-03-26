@@ -18,6 +18,8 @@ int ping(int TriggerPin, int EchoPin) {
   return distanceCm;
 }
 
+int enabled_ultrasound = 0;
+
 unsigned int dUS1;
 
 // Definir la función que se ejecutará en la tarea
@@ -26,14 +28,16 @@ void task_ultrasonidos(void *pvParameters) {
   pinMode(US1_EchoPin, INPUT);
   TickType_t xLastWakeTime = xTaskGetTickCount();
   while (1) {
-
-    // Usar el código de ping en la tarea
-    long distance = ping(US1_TriggerPin, US1_EchoPin);  // Llamada a la función ping
-    if (distance > 0) {
-      dUS1 = distance;  // Asignar la distancia medida a la variable global
-      } 
-    else {
-      dUS1 = 200;  // Valor inválido si no se detecta eco
+    if (enabled_ultrasound > 0)
+      {
+      // Usar el código de ping en la tarea
+      long distance = ping(US1_TriggerPin, US1_EchoPin);  // Llamada a la función ping
+      if (distance > 0) {
+        dUS1 = distance;  // Asignar la distancia medida a la variable global
+        } 
+      else {
+        dUS1 = 200;  // Valor inválido si no se detecta eco
+        }
       }
     vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(periodo_task_ultrasonidos));
   }
