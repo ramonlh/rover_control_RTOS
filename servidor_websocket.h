@@ -56,10 +56,18 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
       else if (strcmp(message, "latl") == 0) { tipo_mov = 9; }
       else if (strcmp(message, "latr") == 0) { tipo_mov = 10; }
       else if (strcmp(message, "stop") == 0) { tipo_mov = 0; }
-      else if (strcmp(message, "caml") == 0) { angulo_servo_1 += 1; }
-      else if (strcmp(message, "camr") == 0) { angulo_servo_1 -= 1; }
-      else if (strcmp(message, "camup") == 0) { angulo_servo_2 -= 1; }
-      else if (strcmp(message, "camdn") == 0) { angulo_servo_2 += 1; }
+      else if (strcmp(message, "caml") == 0) { tipo_mov = 31; angulo_servo_1 += 1; }
+      else if (strcmp(message, "camr") == 0) { tipo_mov = 32; angulo_servo_1 -= 1; }
+      else if (strcmp(message, "camup") == 0) { tipo_mov = 33; angulo_servo_2 -= 1; }
+      else if (strcmp(message, "camdn") == 0) { tipo_mov = 34; angulo_servo_2 += 1; }
+      else if (strcmp(message, "DIF") == 0) { tipo_mov = 41; }
+      else if (strcmp(message, "DDF") == 0) { tipo_mov = 42; }
+      else if (strcmp(message, "TIF") == 0) { tipo_mov = 43; }
+      else if (strcmp(message, "TDF") == 0) { tipo_mov = 44; }
+      else if (strcmp(message, "DIR") == 0) { tipo_mov = 45; }
+      else if (strcmp(message, "DDR") == 0) { tipo_mov = 46; }
+      else if (strcmp(message, "TIR") == 0) { tipo_mov = 47; }
+      else if (strcmp(message, "TDR") == 0) { tipo_mov = 48; }
       
       else if (strcmp(message, "speedmenos") == 0) {  // reducir la velocidad
         if (rover_speed > 500) rover_speed -= 500;
@@ -71,9 +79,14 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
         if (rover_speed > 4000) rover_speed = 4000;
         Serial.println(rover_speed);
         }
-      else if (strcmp(message, "luz") == 0) {
+      else if (strcmp(message, "flash") == 0) {
         tipo_mov = 99;
         digitalWrite(pin_led_7colores, !digitalRead(pin_led_7colores)); // Alternar estado de las luces
+        } 
+      else if (strcmp(message, "luces") == 0) {
+        tipo_mov = 99;
+        digitalWrite(pin_led_izquierda, !digitalRead(pin_led_izquierda)); // Alternar estado de las luces
+        digitalWrite(pin_led_derecha, !digitalRead(pin_led_derecha)); // Alternar estado de las luces
         } 
       else if (strcmp(message, "getssids") == 0) {
         tipo_mov = 99;
@@ -82,21 +95,6 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
       }
 
     }
-}
-
-void sendSensorData() {
-  if (webSocket.connectedClients() > 0) { // Solo enviar si hay clientes conectados
-    snprintf(jsonBuffer, JSON_BUFFER_SIZE, "{\"type\":\"sensor\", \"t\":%.2f, \"h\":%.2f}", valores_DHT11.temperature, valores_DHT11.humidity);
-    webSocket.broadcastTXT(jsonBuffer);
-  }
-}
-
-void sendGirosData() {
-  if (webSocket.connectedClients() > 0) { // Solo enviar si hay clientes conectados
-    snprintf(jsonBuffer, JSON_BUFFER_SIZE, "{\"type\":\"giros\", \"a\":%.2f, \"e\":%.2f, \"g\":%.2f}",
-             angleZ, angleY, angleX);
-    webSocket.broadcastTXT(jsonBuffer);
-  }
 }
 
 void sendRadarData() {
@@ -115,9 +113,29 @@ void task_websockets(void *pvParameters) {
   webSocket.onEvent(webSocketEvent);
   TickType_t xLastWakeTime = xTaskGetTickCount();
   while(1) {
-    sendSensorData();
-    sendGirosData();
-    if (enabled_radar == 1) { sendRadarData(); }
+    // send sensor data
+    if (enabled_task_websockets == 1) {
+      if (webSocket.connectedClients() > 0) { // Solo enviar si hay clientes conectados
+        snprintf(jsonBuffer, JSON_BUFFER_SIZE, "{\"type\":\"sensor\", \"t\":%.2f, \"h\":%.2f}", valores_DHT11.temperature, valores_DHT11.humidity);
+        webSocket.broadcastTXT(jsonBuffer);
+        }
+    // send giros data
+      if (webSocket.connectedClients() > 0) { // Solo enviar si hay clientes conectados
+        snprintf(jsonBuffer,JSON_BUFFER_SIZE,"{\"type\":\"giros\",\"a\":%.2f,\"e\":%.2f,\"g\":%.2f}",angleZ, angleY, angleX);
+        webSocket.broadcastTXT(jsonBuffer);
+        }
+    // send radar data
+      if (enabled_radar == 1) { 
+        if (enviar_dist == 1)
+          {
+          if (webSocket.connectedClients() > 0) { // Solo enviar si hay clientes conectados
+            snprintf(jsonBuffer, JSON_BUFFER_SIZE, "{\"type\":\"radar\", \"ang\":%ld, \"dis\":%ld}", ang_radar, dist_radar);
+            webSocket.broadcastTXT(jsonBuffer);
+            enviar_dist = 0;
+            }
+          }
+        }
+      }
     vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(periodo_task_websockets));
     }
 }
