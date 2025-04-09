@@ -20,7 +20,10 @@ const char head_1[] PROGMEM =    // cabeceras
         "p {font-size: 14px;color: #888;margin-bottom: 10px;}"
         ".indtemp {display:flex; justify-content: space-around; margin:10px 0;}"
         ".indicator {text-align: center;}"
-        ".car {width: 60px;  height: 60px; transition: transform 0.3s ease; transform-origin: center center;}"
+        ".car {width: auto;height: auto;max-width: 60px;max-height: 60px;transition: transform 0.3s ease;"
+        "transform-origin: center center;object-fit: contain;}"
+        ".carminus {width: auto;height: auto;max-width: 40px;max-height: 40px;transition: transform 0.3s ease;"
+        "transform-origin: center center;object-fit: contain;}"
         ".bar {width: 150px; height: 20px; background-color: #e0e0e0; border-radius: 10px; overflow: hidden; position: relative; margin: 10px auto; }"
         ".barfill {height: 100%; background-color: #3498db; width: var(--percent, 0%); }"
         ".bar::after {content: attr(data-value); font-size: 14px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #444444; }"
@@ -49,7 +52,7 @@ const char head_2[] PROGMEM =    // cabeceras
     "</div>"
     "<button onmousedown=\"mvD('camdn')\" onmouseup=\"stopD()\">&#9660;</button><br>\n"
     //"<p><span id=\"dUS1\">--</span>cm</p>"
-    "<p>angulo: <span id=\"ang\">--</span> º --- distancia: <span id=\"dis\">--</span> mm</p>"
+    "<p>angulo: <span id=\"ang\">--</span> º --- distancia: <span id=\"dis\">--</span> cm</p>"
 
     "<canvas id=\"radarCanvas\" width=\"340\" height=\"180\"></canvas><br>"
     "<button onmousedown=\"mvD('fl')\" onmouseup=\"stopD('stop')\">Giro Izda</button>\n"
@@ -58,16 +61,20 @@ const char head_2[] PROGMEM =    // cabeceras
     "<div style=\"display: flex; align-items: center; justify-content: center; gap: 5px;\">"
       "<div><button id=controlButton8 onmousedown=\"mvD('latl')\" onmouseup=\"stopD()\">Lat Izda</button></div>\n"
       "<div class=\"indicator\">"
-        "<img src=\"/carside\" alt=\"Car\" id=\"carelev\" class=\"car\">"
-        "<p>Cab: <span id=\"e\">--</span>°</p>"
+        "<img src=\"/carback\" id=\"carelev\" class=\"carminus\">"
+        "<p>Ala: <span id=\"e\">--</span>°</p>"
       "</div>"
       "<div class=\"indicator\">"
-        "<img src=\"/carup\" alt=\"Car\" id=\"carazim\" class=\"car\">"
+      "</div>"
+      "<div class=\"indicator\">"
+        "<img src=\"/carup\" id=\"carazim\" class=\"car\">"
         "<p><span id=\"a\">--</span>°</p>"
       "</div>"
       "<div class=\"indicator\">"
-        "<img src=\"/carback\" alt=\"Car\" id=\"cargiro\" class=\"car\">"
-        "<p>Ala: <span id=\"g\">--</span>°</p>"
+      "</div>"
+      "<div class=\"indicator\">"
+        "<img src=\"/carside\" id=\"cargiro\" class=\"car\">"
+        "<p>Cab: <span id=\"g\">--</span>°</p>"
       "</div>"
       "<div><button onmousedown=\"mvD('latr')\" onmouseup=\"stopD()\">Lat Dcha</button>\n</div>"
     "</div>"
@@ -82,7 +89,8 @@ const char head_2[] PROGMEM =    // cabeceras
     "<span id=\"sp_needle\">1000</span>"
     "<button onclick=\"sCom('speedmas')\">+++</button><br>"
    "</div>"   
-   "<button onclick=\"sCom('luz')\">Luz</button>"
+   "<button onclick=\"sCom('luces')\">Luces</button>"
+   "<button onclick=\"sCom('flash')\">Flash</button>"
    "<a href=\"/setup\"><button>Config</button></a>"
   "<div style=\"display: flex; justify-content: center; align-items: center; flex-direction: column; margin: 20px;\"></div>"
   "<div id=\"wsStatus\" style=\"font-size: 18px; margin-top: 20px; color: green;\"></div>"
@@ -99,7 +107,16 @@ const char head_2[] PROGMEM =    // cabeceras
           "<div class=\"barfill\" style=\"--percent: 0%;\"></div>"
         "</div>"
       "</div>"
-    "</div>";
+    "</div>"
+    "RUEDAS<br>"
+    "<button onmousedown=\"mvD('DIF')\" onmouseup=\"stopD('stop')\">DI-F</button>\n"
+    "<button onmousedown=\"mvD('DDF')\" onmouseup=\"stopD('stop')\">DD-F</button>\n<br>"
+    "<button onmousedown=\"mvD('DIR')\" onmouseup=\"stopD('stop')\">DI-R</button>\n"
+    "<button onmousedown=\"mvD('DDR')\" onmouseup=\"stopD('stop')\">DD-R</button>\n<br><br>"
+    "<button onmousedown=\"mvD('TIF')\" onmouseup=\"stopD('stop')\">TI-F</button>\n"
+    "<button onmousedown=\"mvD('TDF')\" onmouseup=\"stopD('stop')\">TD-F</button>\n<br>"
+    "<button onmousedown=\"mvD('TIR')\" onmouseup=\"stopD('stop')\">TI-R</button>\n"
+    "<button onmousedown=\"mvD('TDR')\" onmouseup=\"stopD('stop')\">TD-R</button>\n";
 
 const char script_01[] PROGMEM =
   "<script>"
@@ -199,18 +216,13 @@ const char script_01[] PROGMEM =
       "document.getElementById(\"a\").innerText=a.toFixed(1);"
       "document.getElementById(\"e\").innerText=e.toFixed(1);"
       "document.getElementById(\"g\").innerText=g.toFixed(1);}"
-      
-    "function upIndRadar(ang,dis) {"
-      "document.getElementById(\"ang\").innerText=ang.toFixed(1);"
-      "document.getElementById(\"dis\").innerText=dis.toFixed(1);}"
-
   "let detections= new Array(181).fill(null);" // Almacena distancias por ángulo (-90 a 90)
   "let lastAng=-90;" // Último ángulo detectado
 
   "function upIndRadar(ang,dis) {"
     // Redondear y mostrar valores de ángulo y distancia
     "document.getElementById(\"ang\").innerText=ang.toFixed(1);"
-    "document.getElementById(\"dis\").innerText=dis.toFixed(1);"
+    "document.getElementById(\"dis\").innerText=(dis/10).toFixed(1);"
 
     // Guardar la distancia en el array de detecciones (ajustando índice de -90 a 90)
     "let index=ang+90;"
@@ -329,7 +341,7 @@ const char setup_page_2[] PROGMEM =    // cabeceras
       "const ssids=JSON.parse(event.data);"  // Suponiendo que el ESP32 responde con una lista de SSIDs
         //"console.log(\"Tipo de ssids:\", typeof ssids);" // Verifica el tipo de dato (debe ser 'object' o 'array').
         //"console.log(\"Lista de SSIDs:\", ssids);" // Imprime los datos parseados.
-         //Verifica si ssids es realmente un array.
+        //Verifica si ssids es realmente un array.
       "if (!Array.isArray(ssids)) {throw new Error(\"El dato recibido no es un array válido.\");}"
       "const ssidList = document.getElementById(\"ssidList\");"
       "ssidList.innerHTML='';"
