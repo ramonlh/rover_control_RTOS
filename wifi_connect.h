@@ -1,9 +1,10 @@
 
 
 #include "WiFi.h"
+#include "secrets.h"
 
-const char *ssid = "TU_WIFI";
-const char *password = "TU_PASSWORD_WIFI";  
+const char *ssid = SECRET_WIFI_SSID;
+const char *password = SECRET_WIFI_PASSWORD;  
 
 const char *ssidAP = "ROVER_DIEGO";
 const char *passwordAP = "12341234";  

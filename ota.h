@@ -3,7 +3,6 @@
 void init_ota()
 {
   ///////////////////////////////
-  //ArduinoOTA.setPassword("TU_PASSWORD_OTA");
   ArduinoOTA.setPassword(password_OTA);
   
   ArduinoOTA

@@ -28,7 +28,8 @@ constexpr uint8_t pin_choque = 17;
 
 constexpr uint16_t PORT_WEBSERVER = 80;
 constexpr uint16_t PORT_WEBSOCKET = 81;
-constexpr char password_OTA[] = "TU_PASSWORD_OTA";  // Mejor con array de caracteres
+#include "secrets.h"
+constexpr char password_OTA[] = SECRET_OTA_PASSWORD;  // Mejor con array de caracteres
 
 constexpr uint8_t i2caddress_MCP23017 = 0x20;
 constexpr uint8_t i2caddress_VL53L0 = 0x29;
